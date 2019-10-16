@@ -1,0 +1,7 @@
+specFileName: /home/jneto/workspace/worldnet-docs/specs.yaml
+apiTitle: Worldnet API
+splitSpec: false
+codeSamples: true
+swaggerUI: false
+travis: false
+oasVersion: 3.0.1
