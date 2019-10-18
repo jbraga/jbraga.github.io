@@ -1,0 +1,2 @@
+curl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \
+  -H "Authorization: Basic <Merchant API Key>"
