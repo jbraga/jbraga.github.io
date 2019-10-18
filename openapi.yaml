@@ -13,8 +13,8 @@ info:
 
     # Authentication
     The Worldnet API uses a combination of API Keys and [Java Web Tokens (JWT)](https://jwt.io/) to authenticate requests. 
-    API Key's hold all the necessary information for issuing JWT access tokens which in turn are required for all authenticated operations.
-    Therefore, before you can start making any calls, you must generate an API Key and use it to obtain an access token.
+    API Key's hold all the necessary information for issuing JWT access tokens which in turn are required to access protected resources and operations.
+    Therefore, before you can start making any calls, you must generate an API Key and use it to obtain access tokens.
 
     Please, make yourself familiar with the following security schemes before proceeding:
     <!-- ReDoc-Inject: <security-definitions> -->
@@ -23,13 +23,13 @@ info:
     1. [Log into the SelfCare System](#) with the credentials you received in the welcome email.
     2. Under *Settings*, navigate to *API Keys*, and then click the `NEW API KEY` button.
     4. Enter an alias and set the permission modes for each Sub-API.
-    5. Select the processing terminals that your Key will be allowed to operate.
+    5. Select the terminals that you want the API Key to be allowed to operate.
     6. Back on the list, choose the action `View Authentication Key` to be able to see your API Key.
 
     ## Obtaining an Access Token
     In order to obtain an access token you must use the [authenticate](#operation/authenticate) operation passing your API Key in the `HTTP Authorization` header with `Basic` authentication scheme.
 
-    In the snippet bellow we show how to achieve that using [cURL](https://github.com/curl/curl). However, if you are not familiar with command line tools we recommend [Postman](https://www.getpostman.com/) instead.
+    In the snippet bellow we show how to achieve that using [cURL](https://github.com/curl/curl). However, if you are not familiar with command line tools we recommend [Postman](https://www.getpostman.com/).
 
     ```
     curl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \
@@ -37,7 +37,7 @@ info:
     ```
 
     For every successful request you should receive a response just like the one bellow containing the information associated with your crendentials, such as hours to expiry and privileges.
-    Include the JWT Token from the `token` property in the `Authorization` header with `Bearer` authentication scheme for every following request in order to prove your identity and access protected resources.
+    Include the JWT Token from the `token` property in the `Authorization` header with `Bearer` authentication scheme for following requests in order to prove your identity and access protected resources.
 
     ```
     {
@@ -49,21 +49,22 @@ info:
         "expiresIn": "<Hours to Expiry>",
         "enableHypermedia": true,
         "roles": [
-            // List of privileges
+
         ],
         "allowedTerminals": [
-            // List of terminals
+
         ]
     }
     ```
 
-    For security reasons, access tokens expire after a certain amount of time. Therefore, your application must implement a mechanism to keep track of `issuedAt` and `expiresIn` values in order to decide the right moment to automatically request new tokens.
+    For security reasons, access tokens expire after a certain amount of time.
+    Therefore, your application must implement a mechanism to keep track of `issuedAt` and `expiresIn` values in order to decide the right moment to automatically request new tokens.
 
     **Note:** Your application must not hard-code the lifespan of a token as the value of `expiresIn` property is subject to change without prior notice.
 
     ## Making Authenticated Calls
     Apart from the [authenticate](#operation/authenticate) operation, the entire API requires `Bearer` authentication scheme and expects a valid JWT token as proof of identity.
-    The [cURL](https://github.com/curl/curl) snippet bellow is an example of how to use your access token, in this case, to request the list of terminals available for your account.
+    The [cURL](https://github.com/curl/curl) snippet bellow is an example of how to use your access token, in this specific case, to request the list of available terminals in your account.
 
     ```
     curl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=10 \
@@ -103,6 +104,12 @@ info:
     [Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) | The body format of the request your application is sending to the API.<br />The Worldnet API only consumes `application/json` content type.
     [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) | It must contain contain the credentials (API Key or JWT Access Token) to authenticate your application.<br />The API will issue a `401 Unauthorized` response with the `WWW-Authenticate` header attached if your application fails to use this header properly.
 
+    ## Partial Updates
+    Partial update requests are signaled with the HTTP method `PATCH`.
+    In order to perform partial updates, clients must specify only the properties that have changed.
+
+    **Note:** To clear the content of a property, supply an empty value.
+
     ## Testing Requests
     Eventually it will be necessary to perform some transactions.
     For resources such as testing credit cards and simulated responses, see [Testing Resources](https://docs.worldnettps.com/doku.php?id=developer:integration_docs:testing-guide#testing_resources).
@@ -112,9 +119,9 @@ info:
     Some resources might also include contextual hypermedia links. We strongly recommend that clients use these links in order to request more information or perform additional actions on a given resource.
 
     ## HTTP Status Codes
-    The Worldnet API adopted a comprehensive range of status codes where `2XX` statuses are returned for successful requests and `4XX` or `5XX` for failed requests.
+    The Worldnet API has adopted a comprehensive range of status codes where `2XX` statuses are returned for successful requests and `4XX` or `5XX` for failed requests.
 
-    Find below the full range of status codes:
+    The full range of status codes supported by Worldnet:
 
     HTTP Status Code  | Description
     ----------------- | -------------
@@ -164,69 +171,59 @@ info:
 
     ```
     "links": [
-            {
-                "params": {
-                    "rel": "capture",
-                    "type": "PATCH"
-                },
-                "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/capture"
-            },
-            {
-                "params": {
-                    "rel": "refund",
-                    "type": "POST"
-                },
-                "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/refunds"
-            },
-            {
-                "params": {
-                    "rel": "update",
-                    "type": "PATCH"
-                },
-                "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
-            },
-            {
-                "params": {
-                    "rel": "self",
-                    "type": "GET"
-                },
-                "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
-            },
-            {
-                "params": {
-                    "rel": "reverse",
-                    "type": "DELETE"
-                },
-                "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
-            }
-        ]
+        {
+            "rel": "capture",
+            "method": "PATCH"
+            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/capture"
+        },
+        {
+            "rel": "refund",
+            "method": "POST"
+            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/refunds"
+        },
+        {
+            "rel": "update",
+            "method": "PATCH"
+            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
+        },
+        {
+            "rel": "self",
+            "method": "GET"
+            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
+        },
+        {
+            "rel": "reverse",
+            "method": "DELETE"
+            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
+        }
+    ]
     ```
 
     # Pagination
     Worldnet implements cursor-based pagination which is sometimes referred as continuation token pagination.
     This pagination approach works by returning a pointer to a specific item in the dataset. On subsequent requests, the server returns results after the given pointer.
 
-    For all pagination resources Worldnet returns the total count and a hypermedia link that points to the next set of results.
-    Although client applications are able to implement pagination manually by sending the cursor via the `next` query parameter, we strongly recommend the use of the pagination link as showed below:
+    Clients don't need to worry about implementing complex pagination mechanism in their applications as Worldnet returns the total count and a hypermedia link that can be used to load more result for all paginated resources.
     ```
     "links": [
         {
-            "params": {
-                "rel": "next",
-                "type": "GET"
-            },
+            "rel": "next",
+            "method": "GET"
             "href": "https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?next=CWY4XRGUUY"
         }
     ],
     "totalCount": 2
     ```
 
-    The default and maximum number of elements per page is `100`, but you can change it by adding the query parameter `pageSize` to your requests as follows.
+    The default and maximum number of elements per page is `100`, but it can be changed by adding the query parameter `pageSize` to requests as follows:
     ```
     curl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=5 \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <JWT Token>"
     ```
+
+    **Note:** For performance reasons, the elements inside of a paginated list only represent a compact version of the resource listed.
+    In order to retrieve the full version of a given resource, client applications must make a subsequent request using the proper hypermedia link.
 
     # Versioning
     Versioning ensures that changes are backward compatible. The Worldnet API uses a major and minor version nomenclature to manage changes.
@@ -253,25 +250,33 @@ servers:
   - url: //devpayments.worldnettps.com/merchant
     description: Sandbox Server
 tags:
-  - name: Access Tokens
-    description: Authentication Operations
-  - name: Settings
-    description: Terminal and Device Settings
-  - name: Balances
-    description: EBT Balance Inquiries
-  - name: Secure Credentials
-    description: Tokenization of customer's cards and accounts
-  - name: Payments
-    description: 'Sales, Pre-authorizations, Captures and Reversals Transactions'
-  - name: Refunds
-    description: Refunds / Returns / Cancelations
-  - name: Transactions
-    description: List of payments and refunds
+  - name: tokens
+    description: TODO
+    x-displayName: Access Tokens
+  - name: settings
+    description: TODO
+    x-displayName: Settings
+  - name: balances
+    description: TODO
+    x-displayName: Balances
+  - name: credentials
+    description: TODO
+    x-displayName: Secure Credentials
+  - name: payments
+    description: TODO
+    x-displayName: Payments
+  - name: refunds
+    description: TODO
+    x-displayName: Refunds
+  - name: transactions
+    description: TODO
+    x-displayName: Transactions
 paths:
   /api/v1/account/authenticate:
     get:
       tags:
-        - Access Tokens
+        - tokens
+      summary: Authenticate
       description: Use this operation to exchange your `API Key` for a `JWT Token` that will give you access to the API.
       operationId: authenticate
       parameters:
@@ -284,24 +289,407 @@ paths:
       responses:
         '200':
           description: JWT Access Token has been issued successfully
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessToken'
         '401':
           description: 'Authentication failed, the API Key has either been revoked or not found'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         '403':
           description: 'Authorization failed, the requester''s host is not allowed to use the API Key'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
       security:
         - Basic: []
+      x-code-samples:
+        - lang: CURL
+          source: |
+            curl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \
+              -H "Authorization: Basic <Merchant API Key>"
+  '/api/v1/account/terminals/{terminalNumber}':
+    get:
+      tags:
+        - settings
+      summary: Load Terminal
+      description: Loads the full details about the terminal's configuration. Supply the number of one of the terminals returned by the list operation.
+      operationId: loadTerminalConfiguration
+      parameters:
+        - name: terminalNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Terminal'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer:
+            - 'account-api:full-access'
+            - 'account-api:ready-only'
+    patch:
+      tags:
+        - settings
+      summary: Update Terminal
+      description: 'Partially updates the configuration of a terminal. Currently, the API only supports Tips and Taxes update.'
+      operationId: updateTerminalConfiguration
+      parameters:
+        - name: terminalNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTerminalRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Terminal'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer:
+            - 'account-api:full-access'
+  /api/v1/account/terminals:
+    get:
+      tags:
+        - settings
+      summary: List Terminals
+      description: Returns a paginated list of basic information about the terminals assigned to the access token via API Key. Use the `load` hypermedia link to retrieve the full configuration of a terminal.
+      operationId: listTerminals
+      parameters:
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 100
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalPaginatedResult'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer:
+            - 'account-api:full-access'
+            - 'account-api:ready-only'
+  '/api/v1/account/terminals/{terminalNumber}/endOfDay':
+    patch:
+      tags:
+        - settings
+      summary: End Of Day
+      description: 'For terminals in manual settle mode, this operation must be used to indicate the end-of-day closing so that clearing and settlement processes can take place.'
+      operationId: updateTerminalEndOfDayCutOffTime
+      parameters:
+        - name: terminalNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Terminal'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer:
+            - 'account-api:full-access'
+  '/api/v1/account/terminals/{terminalNumber}/devices/{type}':
+    get:
+      tags:
+        - settings
+      summary: Load POS Device Type
+      description: Loads the full details about the device's configuration. Supply the type of one of the devices returned by the list operation.
+      operationId: getDeviceConfiguration
+      parameters:
+        - name: terminalNumber
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceType'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer:
+            - 'account-api:full-access'
+            - 'account-api:ready-only'
+  '/api/v1/account/terminals/{terminalNumber}/devices':
+    get:
+      tags:
+        - settings
+      summary: List POS Device Types
+      description: Returns a paginated list of basic information about the POS device types supported by the terminal. Use the `load` hypermedia link to retrieve the complete information about a POS device.
+      operationId: list
+      parameters:
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: terminalNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePaginatedResult'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer:
+            - 'account-api:full-access'
+            - 'account-api:ready-only'
 components:
   schemas:
     AccessToken:
@@ -331,7 +719,7 @@ components:
           description: JWT Access Token
         issuedAt:
           type: string
-          description: Exact date and time the token has been issued
+          description: Exact date and time that the token has been issued
           format: date-time
         expiresIn:
           type: integer
@@ -339,23 +727,23 @@ components:
           format: int32
         enableHypermedia:
           type: boolean
-          description: Indicates whether or not hypermedia links should be injected into response
+          description: Indicates whether or not the response should contains hypermedia links
         roles:
           uniqueItems: true
           type: array
-          description: Set of roles the token was granted
+          description: Set of roles with which the token was granted
           example: 'transaction-api:ready-only'
           items:
             type: string
-            description: Set of roles the token was granted
+            description: Set of roles with which the token was granted
             example: 'transaction-api:ready-only'
         allowedTerminals:
           uniqueItems: true
           type: array
-          description: Set of terminal numbers the token is allowed to operate
+          description: Set of terminal numbers with which the token is allowed to operate
           items:
             type: string
-            description: Set of terminal numbers the token is allowed to operate
+            description: Set of terminal numbers with which the token is allowed to operate
     Error:
       required:
         - debugIdentifier
@@ -364,6 +752,7 @@ components:
       properties:
         debugIdentifier:
           type: string
+          description: Clients should use this field when communicating to our support team.It allows us to easily identify the request and consequently the reason behind its failure.
         details:
           uniqueItems: true
           type: array
@@ -375,13 +764,16 @@ components:
         - errorMessage
       type: object
       properties:
-        about:
-          type: string
-          format: uri
         errorCode:
           type: string
+          description: A code assigned by Worldnet to each type of failure.
         errorMessage:
           type: string
+          description: A brief description of the given error.
+        about:
+          type: string
+          description: A link to an external documentation that fully explains the issue.
+          format: uri
         source:
           $ref: '#/components/schemas/ErrorSource'
     ErrorSource:
@@ -391,6 +783,7 @@ components:
       properties:
         location:
           type: string
+          description: The HTTP message element that contains the invalid value.
           enum:
             - HEADER
             - BODY
@@ -398,10 +791,974 @@ components:
             - QUERY
         resource:
           type: string
+          description: 'For errors in the request body, this field points to the object that contains the invalid property.'
         property:
           type: string
+          description: The field or parameter that carries the invalid value.
+        value:
+          type: object
+          description: Invalid value sent by the client.
         expected:
           type: object
+          description: Here the server gives a hint of how the client should fix the issue.
+    Address:
+      type: object
+      properties:
+        line1:
+          maxLength: 50
+          minLength: 0
+          type: string
+        line2:
+          maxLength: 50
+          minLength: 0
+          type: string
+        postalCode:
+          maxLength: 50
+          minLength: 0
+          type: string
+        city:
+          maxLength: 128
+          minLength: 0
+          type: string
+        region:
+          maxLength: 128
+          minLength: 0
+          type: string
+        country:
+          maxLength: 2
+          minLength: 2
+          type: string
+      description: Merchant's address.
+    AvsCheck:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        compulsory:
+          type: boolean
+        autoDeclineTransactionsOnAvsFailures:
+          type: boolean
+        preferredAddressMode:
+          type: string
+          enum:
+            - EXACT
+            - POSTAL
+        avsApprovalCodes:
+          type: array
+          items:
+            type: string
+            enum:
+              - 'Y'
+              - A
+              - Z
+              - 'N'
+              - U
+              - R
+              - G
+              - S
+              - F
+              - W
+              - X
+    CardLevelLimit:
+      required:
+        - card
+        - limits
+      type: object
+      properties:
+        card:
+          type: string
+        limits:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardVolumeLimit'
+      description: List of card-level volume limits.
+    CardVolumeLimit:
+      required:
+        - limitScope
+        - limitThreshold
+      type: object
+      properties:
+        limitScope:
+          type: string
+          enum:
+            - DAILY
+            - MONTHLY
+            - SINGLE_TRANSACTION
+        limitThreshold:
+          type: integer
+          format: int32
+        withoutCvvOnly:
+          type: boolean
+        withoutAvsOnly:
+          type: boolean
+        currentValue:
+          type: number
+    CvvCheck:
+      required:
+        - enabled
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        autoDeclineTransactionsOnCvvFailures:
+          type: boolean
+        cvvDeclineCodes:
+          type: array
+          items:
+            type: string
+            enum:
+              - M
+              - 'N'
+              - P
+              - U
+    HypermediaLink:
+      type: object
+      properties:
+        rel:
+          type: string
+          description: Keyword that represents the action that the link is supposed to perform.
+        method:
+          type: string
+          description: The HTTP method or verb.
+          example: POST
+        href:
+          type: string
+          description: The actual request URL.
+    MerchantDetails:
+      required:
+        - email
+        - mcc
+        - name
+        - phone
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Merchant's DBA (Doing Business As).
+        mcc:
+          maxLength: 4
+          minLength: 4
+          pattern: '^[0-9]*$'
+          type: string
+          description: Merchant Category Code.
+        phone:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Merchant's phone number.
+        email:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Merchant's email address.
+        website:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: Merchant's web page.
+        address:
+          $ref: '#/components/schemas/Address'
+        merchantVolumeLimits:
+          type: array
+          description: List of merchant-level volume limits.
+          items:
+            $ref: '#/components/schemas/MerchantLevelLimit'
+      description: Basic information about the merchant.
+    MerchantLevelLimit:
+      required:
+        - limitScope
+        - limitThreshold
+      type: object
+      properties:
+        limitScope:
+          type: string
+          enum:
+            - DAILY
+            - MONTHLY
+            - SINGLE_TRANSACTION
+        limitThreshold:
+          type: integer
+          format: int32
+        withoutCvvOnly:
+          type: boolean
+        withoutAvsOnly:
+          type: boolean
+      description: List of merchant-level volume limits.
+    SecurityFraudSettings:
+      required:
+        - allowCardholderSignatureBypass
+        - avsCheck
+        - cvvCheck
+      type: object
+      properties:
+        cvvCheck:
+          $ref: '#/components/schemas/CvvCheck'
+        avsCheck:
+          $ref: '#/components/schemas/AvsCheck'
+        allowCardholderSignatureBypass:
+          type: boolean
+      description: Terminal security and fraud detection configuration.
+    Terminal:
+      required:
+        - merchantDetails
+        - paymentProcessor
+        - securityFraudSettings
+        - terminalNumber
+        - terminalSettings
+      type: object
+      properties:
+        displayName:
+          maxLength: 24
+          minLength: 0
+          type: string
+          description: Friendly name assigned by the merchant.
+        terminalNumber:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Unique number assigned by Worldnet.
+        paymentProcessor:
+          maxLength: 128
+          minLength: 0
+          type: string
+          description: The financial entity that will process and authorise the operations performed by the terminal.
+        merchantDetails:
+          $ref: '#/components/schemas/MerchantDetails'
+        terminalSettings:
+          $ref: '#/components/schemas/TerminalSettings'
+        securityFraudSettings:
+          $ref: '#/components/schemas/SecurityFraudSettings'
+        terminalTips:
+          type: array
+          description: List of pre-filled tips.
+          items:
+            $ref: '#/components/schemas/TerminalTip'
+        terminalTaxes:
+          type: array
+          description: List of supported taxes.
+          items:
+            $ref: '#/components/schemas/TerminalTax'
+        terminalCustomFields:
+          type: array
+          description: List of additional data fields that can be used when performing transactions or storing secure credentials.
+          items:
+            $ref: '#/components/schemas/TerminalCustomField'
+        supportedCards:
+          type: array
+          description: The list of card brands supported by the terminal.
+          items:
+            type: string
+            description: The list of card brands supported by the terminal.
+        supportedCurrencies:
+          type: array
+          description: The list of currencies supported by the terminal.
+          items:
+            type: string
+            description: The list of currencies supported by the terminal.
+            enum:
+              - AED
+              - AFN
+              - ALL
+              - AMD
+              - ANG
+              - AOA
+              - ARS
+              - AUD
+              - AWG
+              - AZN
+              - BAM
+              - BBD
+              - BDT
+              - BGN
+              - BHD
+              - BIF
+              - BMD
+              - BND
+              - BOB
+              - BOV
+              - BRL
+              - BSD
+              - BTN
+              - BWP
+              - BYR
+              - BZD
+              - CAD
+              - CDF
+              - CHE
+              - CHF
+              - CHW
+              - CLF
+              - CLP
+              - CNY
+              - COP
+              - COU
+              - CRC
+              - CUC
+              - CUP
+              - CVE
+              - CZK
+              - DJF
+              - DKK
+              - DOP
+              - DZD
+              - EGP
+              - ERN
+              - ETB
+              - EUR
+              - FJD
+              - FKP
+              - GBP
+              - GEL
+              - GHS
+              - GIP
+              - GMD
+              - GNF
+              - GTQ
+              - GYD
+              - HKD
+              - HNL
+              - HRK
+              - HTG
+              - HUF
+              - IDR
+              - ILS
+              - INR
+              - IQD
+              - IRR
+              - ISK
+              - JMD
+              - JOD
+              - JPY
+              - KES
+              - KGS
+              - KHR
+              - KMF
+              - KPW
+              - KRW
+              - KWD
+              - KYD
+              - KZT
+              - LAK
+              - LBP
+              - LKR
+              - LRD
+              - LSL
+              - LTL
+              - LVL
+              - LYD
+              - MAD
+              - MDL
+              - MGA
+              - MKD
+              - MMK
+              - MNT
+              - MOP
+              - MRO
+              - MRU
+              - MUR
+              - MVR
+              - MWK
+              - MXN
+              - MXV
+              - MYR
+              - MZN
+              - NAD
+              - NGN
+              - NIO
+              - NOK
+              - NPR
+              - NZD
+              - OMR
+              - PAB
+              - PEN
+              - PGK
+              - PHP
+              - PKR
+              - PLN
+              - PYG
+              - QAR
+              - RON
+              - RSD
+              - RUB
+              - RWF
+              - SAR
+              - SBD
+              - SCR
+              - SDG
+              - SEK
+              - SGD
+              - SHP
+              - SLL
+              - SOS
+              - SRD
+              - SSP
+              - STD
+              - STN
+              - SVC
+              - SYP
+              - SZL
+              - THB
+              - TJS
+              - TMT
+              - TND
+              - TOP
+              - TRY
+              - TTD
+              - TWD
+              - TZS
+              - UAH
+              - UGX
+              - USD
+              - USN
+              - USS
+              - UYI
+              - UYU
+              - UZS
+              - VEF
+              - VES
+              - VND
+              - VUV
+              - WST
+              - XAF
+              - XCD
+              - XOF
+              - XPF
+              - YER
+              - ZAR
+              - ZMW
+              - ZWL
+        supportedDeviceTypes:
+          type: array
+          description: The list of POS devices supported by the terminal.
+          items:
+            type: string
+            description: The list of POS devices supported by the terminal.
+        cardVolumeLimits:
+          type: array
+          description: List of card-level volume limits.
+          items:
+            $ref: '#/components/schemas/CardLevelLimit'
+        terminalVolumeLimits:
+          type: array
+          description: List of terminal-level volume limits.
+          items:
+            $ref: '#/components/schemas/TerminalLevelLimit'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    TerminalCustomField:
+      required:
+        - displayName
+        - displayOrder
+        - mandatory
+        - name
+        - paymentPage
+        - secureCardOnly
+        - subscription
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+        displayName:
+          type: string
+        displayOrder:
+          type: integer
+          format: int32
+        paymentPage:
+          type: boolean
+        subscription:
+          type: boolean
+        mandatory:
+          type: boolean
+        secureCardOnly:
+          type: boolean
+      description: List of additional data fields that can be used when performing transactions or storing secure credentials.
+    TerminalLevelLimit:
+      required:
+        - limitScope
+        - limitThreshold
+      type: object
+      properties:
+        limitScope:
+          type: string
+          enum:
+            - DAILY
+            - MONTHLY
+            - SINGLE_TRANSACTION
+        limitThreshold:
+          type: integer
+          format: int32
+        withoutCvvOnly:
+          type: boolean
+        withoutAvsOnly:
+          type: boolean
+        currentValue:
+          type: number
+      description: List of terminal-level volume limits.
+    TerminalSettings:
+      required:
+        - allowDigitalWalletPayload
+        - allowEdcc
+        - allowEmcp
+        - allowEmvPayload
+        - allowKeyedPayload
+        - allowMagStripePayload
+        - allowMoto
+        - allowMulticurrency
+        - allowPartialRefund
+        - allowPos
+        - allowPreAuthorization
+        - allowRecurring
+        - allowTokenPayload
+        - allowUnreferencedRefund
+        - allowWeb
+        - automaticSettle
+        - forceUniqueOrderId
+      type: object
+      properties:
+        allowWeb:
+          type: boolean
+        allowPos:
+          type: boolean
+        allowMoto:
+          type: boolean
+        allowEmcp:
+          type: boolean
+        allowEdcc:
+          type: boolean
+        allowMulticurrency:
+          type: boolean
+        allowRecurring:
+          type: boolean
+        allowPreAuthorization:
+          type: boolean
+        allowPartialRefund:
+          type: boolean
+        allowUnreferencedRefund:
+          type: boolean
+        allowDigitalWalletPayload:
+          type: boolean
+        allowEmvPayload:
+          type: boolean
+        allowKeyedPayload:
+          type: boolean
+        allowMagStripePayload:
+          type: boolean
+        allowTokenPayload:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+        automaticSettle:
+          type: boolean
+        batchTime:
+          type: string
+        timeZone:
+          type: string
+      description: Terminal settings and capabilities.
+    TerminalTax:
+      required:
+        - name
+        - rate
+      type: object
+      properties:
+        uniqueReference:
+          maxLength: 10
+          minLength: 10
+          type: string
+        name:
+          type: string
+        rate:
+          maximum: 100
+          exclusiveMaximum: false
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+          format: double
+      description: List of supported taxes.
+    TerminalTip:
+      required:
+        - type
+      type: object
+      properties:
+        uniqueReference:
+          maxLength: 10
+          minLength: 10
+          type: string
+        type:
+          type: string
+          enum:
+            - PERCENTAGE
+            - FIXED_AMOUNT
+        currency:
+          type: string
+          enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
+        amount:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        percentage:
+          maximum: 100
+          exclusiveMaximum: false
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          format: double
+      description: List of pre-filled tips.
+    UpdateTerminalRequest:
+      type: object
+      properties:
+        tips:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/TerminalTip'
+        taxes:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/TerminalTax'
+    TerminalCompact:
+      required:
+        - paymentProcessor
+        - terminalNumber
+      type: object
+      properties:
+        terminalNumber:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Unique number assigned by Worldnet.
+        paymentProcessor:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: The financial entity that will process and authorise the operations performed by the terminal.
+        displayName:
+          maxLength: 24
+          minLength: 0
+          type: string
+          description: Friendly name assigned by the merchant.
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    TerminalPaginatedResult:
+      required:
+        - data
+        - totalCount
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TerminalCompact'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+        totalCount:
+          type: integer
+          format: int64
+    DeviceType:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          maxLength: 30
+          minLength: 1
+          type: string
+        manufacturer:
+          maxLength: 24
+          minLength: 0
+          type: string
+        supportsMagStripe:
+          type: boolean
+        supportsKeyed:
+          type: boolean
+        supportsContactless:
+          type: boolean
+        supportsPinEntry:
+          type: boolean
+        supportsIcc:
+          type: boolean
+        supportsOutputPrinting:
+          type: boolean
+        supportsOutputDisplaying:
+          type: boolean
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmvApplication'
+        certificates:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmvCertificate'
+        revokedCertificates:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmvCertificate'
+        defaultEmvTags:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmvTag'
+    EmvApplication:
+      type: object
+      properties:
+        identifier:
+          type: string
+        version:
+          type: string
+        card:
+          type: string
+        matchType:
+          type: string
+          enum:
+            - FULL
+            - PARTIAL_VISA
+            - PARTIAL_EUROPAY
+    EmvCertificate:
+      type: object
+      properties:
+        rid:
+          type: string
+        exponent:
+          type: string
+        certificate:
+          type: string
+    EmvTag:
+      required:
+        - hex
+        - value
+      type: object
+      properties:
+        decimal:
+          type: integer
+          format: int32
+        description:
+          type: string
+        hex:
+          type: string
+        value:
+          type: string
+    DevicePaginatedResult:
+      required:
+        - data
+        - totalCount
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceTypeCompact'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+        totalCount:
+          type: integer
+          format: int64
+    DeviceTypeCompact:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          maxLength: 30
+          minLength: 1
+          type: string
+        manufacturer:
+          maxLength: 24
+          minLength: 0
+          type: string
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
   securitySchemes:
     Basic:
       type: http
@@ -417,14 +1774,14 @@ components:
 x-tagGroups:
   - name: ACCOUNT API
     tags:
-      - Access Tokens
-      - Settings
+      - tokens
+      - settings
   - name: CUSTOMER API
     tags:
-      - Balances
-      - Secure Credentials
+      - balances
+      - credentials
   - name: TRANSACTION API
     tags:
-      - Payments
-      - Refunds
-      - Transactions
+      - payments
+      - refunds
+      - transactions
