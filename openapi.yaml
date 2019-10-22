@@ -232,14 +232,14 @@ info:
     Major version numbers will reflect in the REST URL, for example `/api/v1/transaction/payments`.
 
     Currently, **v1** is the only supported major version.
-
+    
     ## Minor Versions
     Minor and backward-compatible changes will be advertised via `X-API-Version` response header, for example `X-API-Version: 2020-01-01`.
 
     Developers should use this header to keep track of new features and optimisations that might benefit their applications.
   contact:
     name: Support Team
-    url: 'https://worldnettps.com/contact/'
+    url: https://worldnettps.com/contact/
     email: support@worldnettps.com
   version: v1
   x-logo:
@@ -247,47 +247,48 @@ info:
     backgroundColor: '#FFFFFF'
     altText: Worldnet
 servers:
-  - url: //devpayments.worldnettps.com/merchant
-    description: Sandbox Server
+- url: //devpayments.worldnettps.com/merchant
+  description: Sandbox Server
 tags:
-  - name: tokens
-    description: TODO
-    x-displayName: Access Tokens
-  - name: settings
-    description: TODO
-    x-displayName: Settings
-  - name: balances
-    description: TODO
-    x-displayName: Balances
-  - name: credentials
-    description: TODO
-    x-displayName: Secure Credentials
-  - name: payments
-    description: TODO
-    x-displayName: Payments
-  - name: refunds
-    description: TODO
-    x-displayName: Refunds
-  - name: transactions
-    description: TODO
-    x-displayName: Transactions
+- name: tokens
+  description: TODO
+  x-displayName: Access Tokens
+- name: settings
+  description: TODO
+  x-displayName: Settings
+- name: balances
+  description: TODO
+  x-displayName: Balances
+- name: credentials
+  description: TODO
+  x-displayName: Secure Credentials
+- name: payments
+  description: TODO
+  x-displayName: Payments
+- name: refunds
+  description: TODO
+  x-displayName: Refunds
+- name: transactions
+  description: TODO
+  x-displayName: Transactions
 paths:
   /api/v1/account/authenticate:
     get:
       tags:
-        - tokens
+      - tokens
       summary: Authenticate
-      description: Use this operation to exchange your `API Key` for a `JWT Token` that will give you access to the API.
+      description: Use this operation to exchange your `API Key` for a `JWT Token`
+        that will give you access to the API.
       operationId: authenticate
       parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-          example: Basic <Merchant API Key>
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+        example: Basic <Merchant API Key>
       responses:
-        '200':
+        200:
           description: JWT Access Token has been issued successfully
           headers:
             X-Request-Id:
@@ -300,8 +301,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessToken'
-        '401':
-          description: 'Authentication failed, the API Key has either been revoked or not found'
+        401:
+          description: Authentication failed, the API Key has either been revoked
+            or not found
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -313,68 +315,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '403':
-          description: 'Authorization failed, the requester''s host is not allowed to use the API Key'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-        - Basic: []
-      x-code-samples:
-        - lang: CURL
-          source: |
-            curl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \
-              -H "Authorization: Basic <Merchant API Key>"
-  '/api/v1/account/terminals/{terminalNumber}':
-    get:
-      tags:
-        - settings
-      summary: Load Terminal
-      description: Loads the full details about the terminal's configuration. Supply the number of one of the terminals returned by the list operation.
-      operationId: loadTerminalConfiguration
-      parameters:
-        - name: terminalNumber
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Terminal'
-        4XX:
-          description: Client Error
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        5XX:
-          description: Server Error
+        403:
+          description: Authorization failed, the requester's host is not allowed to
+            use the API Key
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -387,86 +330,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       security:
-        - Bearer:
-            - 'account-api:full-access'
-            - 'account-api:ready-only'
-    patch:
-      tags:
-        - settings
-      summary: Update Terminal
-      description: 'Partially updates the configuration of a terminal. Currently, the API only supports Tips and Taxes update.'
-      operationId: updateTerminalConfiguration
-      parameters:
-        - name: terminalNumber
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTerminalRequest'
-        required: true
-      responses:
-        '200':
-          description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Terminal'
-        4XX:
-          description: Client Error
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        5XX:
-          description: Server Error
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-        - Bearer:
-            - 'account-api:full-access'
+      - Basic: []
   /api/v1/account/terminals:
     get:
       tags:
-        - settings
+      - settings
       summary: List Terminals
-      description: Returns a paginated list of basic information about the terminals assigned to the access token via API Key. Use the `load` hypermedia link to retrieve the full configuration of a terminal.
+      description: Returns a paginated list of basic information about the terminals
+        assigned to the access token via API Key. Use the `load` hypermedia link to
+        retrieve the full configuration of a terminal.
       operationId: listTerminals
       parameters:
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-            default: 100
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 100
       responses:
-        '200':
+        200:
           description: OK
           headers:
             X-Request-Id:
@@ -506,24 +388,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       security:
-        - Bearer:
-            - 'account-api:full-access'
-            - 'account-api:ready-only'
-  '/api/v1/account/terminals/{terminalNumber}/endOfDay':
-    patch:
+      - Bearer:
+        - account-api:full-access
+        - account-api:ready-only
+      x-position: "0"
+  /api/v1/account/terminals/{terminalNumber}:
+    get:
       tags:
-        - settings
-      summary: End Of Day
-      description: 'For terminals in manual settle mode, this operation must be used to indicate the end-of-day closing so that clearing and settlement processes can take place.'
-      operationId: updateTerminalEndOfDayCutOffTime
+      - settings
+      summary: Load Terminal
+      description: Loads the full details about the terminal's configuration. Supply
+        the number of one of the terminals returned by the list operation.
+      operationId: loadTerminal
       parameters:
-        - name: terminalNumber
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: terminalNumber
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        '200':
+        200:
           description: OK
           headers:
             X-Request-Id:
@@ -563,28 +447,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       security:
-        - Bearer:
-            - 'account-api:full-access'
-  '/api/v1/account/terminals/{terminalNumber}/devices/{type}':
-    get:
+      - Bearer:
+        - account-api:full-access
+        - account-api:ready-only
+      x-position: "1"
+    patch:
       tags:
-        - settings
-      summary: Load POS Device Type
-      description: Loads the full details about the device's configuration. Supply the type of one of the devices returned by the list operation.
-      operationId: getDeviceConfiguration
+      - settings
+      summary: Update Terminal
+      description: Partially updates the configuration of a terminal. Currently, it
+        is only possible to update tips and taxes.
+      operationId: updateTerminal
       parameters:
-        - name: terminalNumber
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: type
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: terminalNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTerminalRequest'
+        required: true
       responses:
-        '200':
+        200:
           description: OK
           headers:
             X-Request-Id:
@@ -596,7 +483,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeviceType'
+                $ref: '#/components/schemas/Terminal'
         4XX:
           description: Client Error
           headers:
@@ -624,30 +511,91 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       security:
-        - Bearer:
-            - 'account-api:full-access'
-            - 'account-api:ready-only'
-  '/api/v1/account/terminals/{terminalNumber}/devices':
+      - Bearer:
+        - account-api:full-access
+      x-position: "2"
+  /api/v1/account/terminals/{terminalNumber}/endOfDay:
+    patch:
+      tags:
+      - settings
+      summary: End Of Day
+      description: For terminals in manual settle mode, this operation must be used
+        to indicate the end-of-day closing so that clearing and settlement processes
+        can take place.
+      operationId: endOfDay
+      parameters:
+      - name: terminalNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Terminal'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - account-api:full-access
+      x-position: "3"
+  /api/v1/account/terminals/{terminalNumber}/devices:
     get:
       tags:
-        - settings
+      - settings
       summary: List POS Device Types
-      description: Returns a paginated list of basic information about the POS device types supported by the terminal. Use the `load` hypermedia link to retrieve the complete information about a POS device.
-      operationId: list
+      description: Returns a paginated list of basic information about the POS device
+        types supported by the terminal. Use the `load` hypermedia link to retrieve
+        the complete information about a POS device type.
+      operationId: listDeviceTypes
       parameters:
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
-            format: int32
-            default: 100
-        - name: terminalNumber
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      - name: terminalNumber
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        '200':
+        200:
           description: OK
           headers:
             X-Request-Id:
@@ -687,20 +635,85 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       security:
-        - Bearer:
-            - 'account-api:full-access'
-            - 'account-api:ready-only'
+      - Bearer:
+        - account-api:full-access
+        - account-api:ready-only
+      x-position: "4"
+  /api/v1/account/terminals/{terminalNumber}/devices/{type}:
+    get:
+      tags:
+      - settings
+      summary: Load POS Device Type
+      description: Loads the full details about the device's configuration. Supply
+        the type of one of the devices returned by the list operation.
+      operationId: loadDeviceTypes
+      parameters:
+      - name: terminalNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceType'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - account-api:full-access
+        - account-api:ready-only
+      x-position: "5"
 components:
   schemas:
     AccessToken:
       required:
-        - audience
-        - boundTo
-        - enableHypermedia
-        - expiresIn
-        - issuedAt
-        - token
-        - tokenType
+      - audience
+      - boundTo
+      - enableHypermedia
+      - expiresIn
+      - issuedAt
+      - token
+      - tokenType
       type: object
       properties:
         audience:
@@ -709,7 +722,8 @@ components:
           example: devpayments.worldnettps.com
         boundTo:
           type: string
-          description: Alias of the Merchant API Key to which the access token is bound
+          description: Alias of the Merchant API Key to which the access token is
+            bound
         tokenType:
           type: string
           description: Authentication scheme
@@ -727,32 +741,36 @@ components:
           format: int32
         enableHypermedia:
           type: boolean
-          description: Indicates whether or not the response should contains hypermedia links
+          description: Indicates whether the response should contains hypermedia links
         roles:
           uniqueItems: true
           type: array
           description: Set of roles with which the token was granted
-          example: 'transaction-api:ready-only'
+          example: transaction-api:ready-only
           items:
             type: string
             description: Set of roles with which the token was granted
-            example: 'transaction-api:ready-only'
+            example: transaction-api:ready-only
         allowedTerminals:
           uniqueItems: true
           type: array
-          description: Set of terminal numbers with which the token is allowed to operate
+          description: Set of terminal numbers with which the token is allowed to
+            operate
           items:
             type: string
-            description: Set of terminal numbers with which the token is allowed to operate
+            description: Set of terminal numbers with which the token is allowed to
+              operate
     Error:
       required:
-        - debugIdentifier
-        - details
+      - debugIdentifier
+      - details
       type: object
       properties:
         debugIdentifier:
           type: string
-          description: Clients should use this field when communicating to our support team.It allows us to easily identify the request and consequently the reason behind its failure.
+          description: Clients should use this field when communicating to our support
+            team.It allows us to easily identify the request and consequently the
+            reason behind its failure.
         details:
           uniqueItems: true
           type: array
@@ -760,8 +778,8 @@ components:
             $ref: '#/components/schemas/ErrorDetail'
     ErrorDetail:
       required:
-        - errorCode
-        - errorMessage
+      - errorCode
+      - errorMessage
       type: object
       properties:
         errorCode:
@@ -772,26 +790,28 @@ components:
           description: A brief description of the given error.
         about:
           type: string
-          description: A link to an external documentation that fully explains the issue.
+          description: A link to an external documentation that fully explains the
+            issue.
           format: uri
         source:
           $ref: '#/components/schemas/ErrorSource'
     ErrorSource:
       required:
-        - location
+      - location
       type: object
       properties:
         location:
           type: string
           description: The HTTP message element that contains the invalid value.
           enum:
-            - HEADER
-            - BODY
-            - PATH
-            - QUERY
+          - HEADER
+          - BODY
+          - PATH
+          - QUERY
         resource:
           type: string
-          description: 'For errors in the request body, this field points to the object that contains the invalid property.'
+          description: For errors in the request body, this field points to the object
+            that contains the invalid property.
         property:
           type: string
           description: The field or parameter that carries the invalid value.
@@ -800,7 +820,67 @@ components:
           description: Invalid value sent by the client.
         expected:
           type: object
-          description: Here the server gives a hint of how the client should fix the issue.
+          description: Here the server gives a hint of how the client should fix the
+            issue.
+    HypermediaLink:
+      type: object
+      properties:
+        rel:
+          type: string
+          description: Keyword that represents the action that the link is supposed
+            to perform.
+        method:
+          type: string
+          description: The HTTP method or verb.
+          example: POST
+        href:
+          type: string
+          description: The actual request URL.
+    TerminalCompact:
+      required:
+      - paymentProcessor
+      - terminalNumber
+      type: object
+      properties:
+        terminalNumber:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Unique number assigned by Worldnet.
+        paymentProcessor:
+          maxLength: 128
+          minLength: 1
+          type: string
+          description: The financial entity that will process and authorise the operations
+            performed by the terminal.
+        displayName:
+          maxLength: 24
+          minLength: 0
+          type: string
+          description: Friendly name assigned by the merchant.
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    TerminalPaginatedResult:
+      required:
+      - data
+      - totalCount
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TerminalCompact'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+        totalCount:
+          type: integer
+          format: int64
     Address:
       type: object
       properties:
@@ -828,138 +908,176 @@ components:
           maxLength: 2
           minLength: 2
           type: string
-      description: Merchant's address.
+      description: Merchant's address. This information will appear on transaction
+        receipts.
     AvsCheck:
       required:
-        - enabled
+      - enabled
       type: object
       properties:
         enabled:
           type: boolean
+          description: Indicates whether AVS check is available for the terminal and
+            merchants may send cardholder’s billing address for verification.
         compulsory:
           type: boolean
+          description: If enabled, it ensures that a transaction will never be processed
+            without billing address information.
         autoDeclineTransactionsOnAvsFailures:
           type: boolean
+          description: Indicates that all AVS non-match will lead to a transaction
+            decline. This is sometimes desirable as not all card issuers will decline
+            a transaction that has failed an AVS check.
         preferredAddressMode:
           type: string
+          description: |-
+            This field defines a configuration for the execution and validation of AVS transactions.
+            - Exact: At least the first line of the address as well as city and postal code are mandatory.
+            - Postal: Only postal code is mandatory when filling up customer's billing address.
           enum:
-            - EXACT
-            - POSTAL
+          - EXACT
+          - POSTAL
         avsApprovalCodes:
           type: array
+          description: List of AVS result codes that are considered to be a match.
+            The codes left out of this list will lead to a transaction decline when
+            `autoDeclineTransactionsOnAvsFailures` is enabled.
           items:
             type: string
+            description: List of AVS result codes that are considered to be a match.
+              The codes left out of this list will lead to a transaction decline when
+              `autoDeclineTransactionsOnAvsFailures` is enabled.
             enum:
-              - 'Y'
-              - A
-              - Z
-              - 'N'
-              - U
-              - R
-              - G
-              - S
-              - F
-              - W
-              - X
+            - Y
+            - A
+            - Z
+            - N
+            - U
+            - R
+            - G
+            - S
+            - F
+            - W
+            - X
     CardLevelLimit:
       required:
-        - card
-        - limits
+      - card
+      - limits
       type: object
       properties:
         card:
           type: string
+          description: The card brand to which the list of volume limits below will
+            be applied.
         limits:
           type: array
+          description: List of limits to be applied to transactions using the brand
+            specified in the property `card`.
           items:
             $ref: '#/components/schemas/CardVolumeLimit'
       description: List of card-level volume limits.
     CardVolumeLimit:
       required:
-        - limitScope
-        - limitThreshold
+      - limitScope
+      - limitThreshold
       type: object
       properties:
         limitScope:
           type: string
           enum:
-            - DAILY
-            - MONTHLY
-            - SINGLE_TRANSACTION
+          - DAILY
+          - MONTHLY
+          - SINGLE_TRANSACTION
         limitThreshold:
           type: integer
+          description: The maximum amount allowed within the period described in the
+            `limitScope` attribute.
           format: int32
         withoutCvvOnly:
           type: boolean
+          description: If enabled, the limit will only take transactions without CVV
+            into account. This is specially useful for merchants who are looking for
+            a way to add thresholds for transactions that may lead to chargebacks.<br
+            />This filter only applies to limits within `SINGLE_TRANSACTION` scope.
         withoutAvsOnly:
           type: boolean
+          description: If enabled, the limit will only take transactions without AVS
+            into account. This is specially useful for merchants who are looking for
+            a way to add thresholds for transactions that may lead to chargebacks.<br
+            />This filter only applies to limits within `SINGLE_TRANSACTION` scope.
         currentValue:
           type: number
+          description: The sum of all transactions performed with the `card` within
+            the period described in the `limitScope` attribute.<br />At the end of
+            each period, this value is reset.
+      description: List of limits to be applied to transactions using the brand specified
+        in the property `card`.
     CvvCheck:
       required:
-        - enabled
+      - enabled
       type: object
       properties:
         enabled:
           type: boolean
+          description: Indicates whether CVV check is available for the terminal.
         autoDeclineTransactionsOnCvvFailures:
           type: boolean
+          description: Indicates that all CVV codes listed in `cvvDeclineCodes` property
+            will lead to a transaction decline.This is sometimes desirable as not
+            all card issuers will decline a transaction that has failed a CVV check.
         cvvDeclineCodes:
           type: array
+          description: List of CVV result codes that will lead to a transaction decline
+            when `autoDeclineTransactionsOnCvvFailures` is enabled.
           items:
             type: string
+            description: List of CVV result codes that will lead to a transaction
+              decline when `autoDeclineTransactionsOnCvvFailures` is enabled.
             enum:
-              - M
-              - 'N'
-              - P
-              - U
-    HypermediaLink:
-      type: object
-      properties:
-        rel:
-          type: string
-          description: Keyword that represents the action that the link is supposed to perform.
-        method:
-          type: string
-          description: The HTTP method or verb.
-          example: POST
-        href:
-          type: string
-          description: The actual request URL.
+            - M
+            - N
+            - P
+            - U
     MerchantDetails:
       required:
-        - email
-        - mcc
-        - name
-        - phone
+      - email
+      - mcc
+      - name
+      - phone
       type: object
       properties:
         name:
           maxLength: 100
           minLength: 0
           type: string
-          description: Merchant's DBA (Doing Business As).
+          description: Merchant's DBA (Doing Business As). This information will appear
+            on transaction receipts.
         mcc:
           maxLength: 4
           minLength: 4
-          pattern: '^[0-9]*$'
+          pattern: ^[0-9]*$
           type: string
-          description: Merchant Category Code.
+          description: Merchant Category Code. It is a four-digit number listed in
+            ISO 18245 for retail financial services. An MCC is used to classify a
+            business by the types of goods or services it provides.
         phone:
           maxLength: 100
           minLength: 0
           type: string
-          description: Merchant's phone number.
+          description: Merchant's phone number. This information will appear on transaction
+            receipts.
         email:
           maxLength: 100
           minLength: 0
           type: string
-          description: Merchant's email address.
+          description: Merchant's email address. This information will appear on transaction
+            receipts.
         website:
           maxLength: 100
           minLength: 0
           type: string
-          description: Merchant's web page.
+          description: Merchant's web page. This information will appear on transaction
+            receipts.
         address:
           $ref: '#/components/schemas/Address'
         merchantVolumeLimits:
@@ -970,29 +1088,39 @@ components:
       description: Basic information about the merchant.
     MerchantLevelLimit:
       required:
-        - limitScope
-        - limitThreshold
+      - limitScope
+      - limitThreshold
       type: object
       properties:
         limitScope:
           type: string
           enum:
-            - DAILY
-            - MONTHLY
-            - SINGLE_TRANSACTION
+          - DAILY
+          - MONTHLY
+          - SINGLE_TRANSACTION
         limitThreshold:
           type: integer
+          description: The maximum amount allowed within the period described in the
+            `limitScope` attribute.
           format: int32
         withoutCvvOnly:
           type: boolean
+          description: If enabled, the limit will only take transactions without CVV
+            into account. This is specially useful for merchants who are looking for
+            a way to add thresholds for transactions that may lead to chargebacks.<br
+            />This filter only applies to limits within `SINGLE_TRANSACTION` scope.
         withoutAvsOnly:
           type: boolean
+          description: If enabled, the limit will only take transactions without AVS
+            into account. This is specially useful for merchants who are looking for
+            a way to add thresholds for transactions that may lead to chargebacks.<br
+            />This filter only applies to limits within `SINGLE_TRANSACTION` scope.
       description: List of merchant-level volume limits.
     SecurityFraudSettings:
       required:
-        - allowCardholderSignatureBypass
-        - avsCheck
-        - cvvCheck
+      - allowCardholderSignatureBypass
+      - avsCheck
+      - cvvCheck
       type: object
       properties:
         cvvCheck:
@@ -1001,14 +1129,16 @@ components:
           $ref: '#/components/schemas/AvsCheck'
         allowCardholderSignatureBypass:
           type: boolean
+          description: Indicates whether cardholder signature requirement should be
+            relaxed.
       description: Terminal security and fraud detection configuration.
     Terminal:
       required:
-        - merchantDetails
-        - paymentProcessor
-        - securityFraudSettings
-        - terminalNumber
-        - terminalSettings
+      - merchantDetails
+      - paymentProcessor
+      - securityFraudSettings
+      - terminalNumber
+      - terminalSettings
       type: object
       properties:
         displayName:
@@ -1025,7 +1155,8 @@ components:
           maxLength: 128
           minLength: 0
           type: string
-          description: The financial entity that will process and authorise the operations performed by the terminal.
+          description: The financial entity that will process and authorise the operations
+            performed by the terminal.
         merchantDetails:
           $ref: '#/components/schemas/MerchantDetails'
         terminalSettings:
@@ -1044,363 +1175,25 @@ components:
             $ref: '#/components/schemas/TerminalTax'
         terminalCustomFields:
           type: array
-          description: List of additional data fields that can be used when performing transactions or storing secure credentials.
+          description: List of additional data fields that can be used when performing
+            transactions or storing secure credentials.
           items:
             $ref: '#/components/schemas/TerminalCustomField'
         supportedCards:
           type: array
-          description: The list of card brands supported by the terminal.
+          description: List of card brands supported by the terminal.
           items:
             type: string
-            description: The list of card brands supported by the terminal.
+            description: List of card brands supported by the terminal.
         supportedCurrencies:
           type: array
-          description: The list of currencies supported by the terminal.
+          description: List of currencies supported by the terminal to multi-currency
+            processing of any kind.
           items:
             type: string
-            description: The list of currencies supported by the terminal.
+            description: List of currencies supported by the terminal to multi-currency
+              processing of any kind.
             enum:
-              - AED
-              - AFN
-              - ALL
-              - AMD
-              - ANG
-              - AOA
-              - ARS
-              - AUD
-              - AWG
-              - AZN
-              - BAM
-              - BBD
-              - BDT
-              - BGN
-              - BHD
-              - BIF
-              - BMD
-              - BND
-              - BOB
-              - BOV
-              - BRL
-              - BSD
-              - BTN
-              - BWP
-              - BYR
-              - BZD
-              - CAD
-              - CDF
-              - CHE
-              - CHF
-              - CHW
-              - CLF
-              - CLP
-              - CNY
-              - COP
-              - COU
-              - CRC
-              - CUC
-              - CUP
-              - CVE
-              - CZK
-              - DJF
-              - DKK
-              - DOP
-              - DZD
-              - EGP
-              - ERN
-              - ETB
-              - EUR
-              - FJD
-              - FKP
-              - GBP
-              - GEL
-              - GHS
-              - GIP
-              - GMD
-              - GNF
-              - GTQ
-              - GYD
-              - HKD
-              - HNL
-              - HRK
-              - HTG
-              - HUF
-              - IDR
-              - ILS
-              - INR
-              - IQD
-              - IRR
-              - ISK
-              - JMD
-              - JOD
-              - JPY
-              - KES
-              - KGS
-              - KHR
-              - KMF
-              - KPW
-              - KRW
-              - KWD
-              - KYD
-              - KZT
-              - LAK
-              - LBP
-              - LKR
-              - LRD
-              - LSL
-              - LTL
-              - LVL
-              - LYD
-              - MAD
-              - MDL
-              - MGA
-              - MKD
-              - MMK
-              - MNT
-              - MOP
-              - MRO
-              - MRU
-              - MUR
-              - MVR
-              - MWK
-              - MXN
-              - MXV
-              - MYR
-              - MZN
-              - NAD
-              - NGN
-              - NIO
-              - NOK
-              - NPR
-              - NZD
-              - OMR
-              - PAB
-              - PEN
-              - PGK
-              - PHP
-              - PKR
-              - PLN
-              - PYG
-              - QAR
-              - RON
-              - RSD
-              - RUB
-              - RWF
-              - SAR
-              - SBD
-              - SCR
-              - SDG
-              - SEK
-              - SGD
-              - SHP
-              - SLL
-              - SOS
-              - SRD
-              - SSP
-              - STD
-              - STN
-              - SVC
-              - SYP
-              - SZL
-              - THB
-              - TJS
-              - TMT
-              - TND
-              - TOP
-              - TRY
-              - TTD
-              - TWD
-              - TZS
-              - UAH
-              - UGX
-              - USD
-              - USN
-              - USS
-              - UYI
-              - UYU
-              - UZS
-              - VEF
-              - VES
-              - VND
-              - VUV
-              - WST
-              - XAF
-              - XCD
-              - XOF
-              - XPF
-              - YER
-              - ZAR
-              - ZMW
-              - ZWL
-        supportedDeviceTypes:
-          type: array
-          description: The list of POS devices supported by the terminal.
-          items:
-            type: string
-            description: The list of POS devices supported by the terminal.
-        cardVolumeLimits:
-          type: array
-          description: List of card-level volume limits.
-          items:
-            $ref: '#/components/schemas/CardLevelLimit'
-        terminalVolumeLimits:
-          type: array
-          description: List of terminal-level volume limits.
-          items:
-            $ref: '#/components/schemas/TerminalLevelLimit'
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-    TerminalCustomField:
-      required:
-        - displayName
-        - displayOrder
-        - mandatory
-        - name
-        - paymentPage
-        - secureCardOnly
-        - subscription
-        - type
-      type: object
-      properties:
-        type:
-          type: string
-        name:
-          type: string
-        displayName:
-          type: string
-        displayOrder:
-          type: integer
-          format: int32
-        paymentPage:
-          type: boolean
-        subscription:
-          type: boolean
-        mandatory:
-          type: boolean
-        secureCardOnly:
-          type: boolean
-      description: List of additional data fields that can be used when performing transactions or storing secure credentials.
-    TerminalLevelLimit:
-      required:
-        - limitScope
-        - limitThreshold
-      type: object
-      properties:
-        limitScope:
-          type: string
-          enum:
-            - DAILY
-            - MONTHLY
-            - SINGLE_TRANSACTION
-        limitThreshold:
-          type: integer
-          format: int32
-        withoutCvvOnly:
-          type: boolean
-        withoutAvsOnly:
-          type: boolean
-        currentValue:
-          type: number
-      description: List of terminal-level volume limits.
-    TerminalSettings:
-      required:
-        - allowDigitalWalletPayload
-        - allowEdcc
-        - allowEmcp
-        - allowEmvPayload
-        - allowKeyedPayload
-        - allowMagStripePayload
-        - allowMoto
-        - allowMulticurrency
-        - allowPartialRefund
-        - allowPos
-        - allowPreAuthorization
-        - allowRecurring
-        - allowTokenPayload
-        - allowUnreferencedRefund
-        - allowWeb
-        - automaticSettle
-        - forceUniqueOrderId
-      type: object
-      properties:
-        allowWeb:
-          type: boolean
-        allowPos:
-          type: boolean
-        allowMoto:
-          type: boolean
-        allowEmcp:
-          type: boolean
-        allowEdcc:
-          type: boolean
-        allowMulticurrency:
-          type: boolean
-        allowRecurring:
-          type: boolean
-        allowPreAuthorization:
-          type: boolean
-        allowPartialRefund:
-          type: boolean
-        allowUnreferencedRefund:
-          type: boolean
-        allowDigitalWalletPayload:
-          type: boolean
-        allowEmvPayload:
-          type: boolean
-        allowKeyedPayload:
-          type: boolean
-        allowMagStripePayload:
-          type: boolean
-        allowTokenPayload:
-          type: boolean
-        forceUniqueOrderId:
-          type: boolean
-        automaticSettle:
-          type: boolean
-        batchTime:
-          type: string
-        timeZone:
-          type: string
-      description: Terminal settings and capabilities.
-    TerminalTax:
-      required:
-        - name
-        - rate
-      type: object
-      properties:
-        uniqueReference:
-          maxLength: 10
-          minLength: 10
-          type: string
-        name:
-          type: string
-        rate:
-          maximum: 100
-          exclusiveMaximum: false
-          minimum: 0
-          exclusiveMinimum: false
-          type: number
-          format: double
-      description: List of supported taxes.
-    TerminalTip:
-      required:
-        - type
-      type: object
-      properties:
-        uniqueReference:
-          maxLength: 10
-          minLength: 10
-          type: string
-        type:
-          type: string
-          enum:
-            - PERCENTAGE
-            - FIXED_AMOUNT
-        currency:
-          type: string
-          enum:
             - AED
             - AFN
             - ALL
@@ -1572,16 +1365,441 @@ components:
             - ZAR
             - ZMW
             - ZWL
+        supportedDeviceTypes:
+          type: array
+          description: List of POS device types supported by the terminal.
+          items:
+            type: string
+            description: List of POS device types supported by the terminal.
+        cardVolumeLimits:
+          type: array
+          description: List of card-level volume limits.
+          items:
+            $ref: '#/components/schemas/CardLevelLimit'
+        terminalVolumeLimits:
+          type: array
+          description: List of terminal-level volume limits.
+          items:
+            $ref: '#/components/schemas/TerminalLevelLimit'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    TerminalCustomField:
+      required:
+      - displayName
+      - displayOrder
+      - mandatory
+      - name
+      - paymentPage
+      - secureCredentialsOnly
+      - subscription
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of the data the custom field is configured to carry.
+          enum:
+          - STRING
+          - NUMERIC
+          - BOOLEAN
+        name:
+          type: string
+          description: Custom field name assigned by the merchant.
+        displayName:
+          type: string
+          description: Friendly name that should be used for receipts and pages.
+        displayOrder:
+          type: integer
+          description: Position of the field in relation to other custom fields.
+          format: int32
+        paymentPage:
+          type: boolean
+          description: Indicates whether the custom field should be shown on Worldnet
+            hosted pages.
+        subscription:
+          type: boolean
+          description: Indicates whether the custom field should be considered for
+            Subscriptions which is Worldnet payment plan / standing order mechanism.
+        secureCredentialsOnly:
+          type: boolean
+          description: Indicates whether the custom field will **only** serve the
+            purpose of adding additional information to secure cards or accounts.
+        mandatory:
+          type: boolean
+          description: If enabled, it ensures that a transaction will never be processed
+            without the custom field properly populated.
+      description: List of additional data fields that can be used when performing
+        transactions or storing secure credentials.
+    TerminalLevelLimit:
+      required:
+      - limitScope
+      - limitThreshold
+      type: object
+      properties:
+        limitScope:
+          type: string
+          enum:
+          - DAILY
+          - MONTHLY
+          - SINGLE_TRANSACTION
+        limitThreshold:
+          type: integer
+          description: The maximum amount allowed within the period described in the
+            `limitScope` attribute.
+          format: int32
+        withoutCvvOnly:
+          type: boolean
+          description: If enabled, the limit will only take transactions without CVV
+            into account. This is specially useful for merchants who are looking for
+            a way to add thresholds for transactions that may lead to chargebacks.<br
+            />This filter only applies to limits within `SINGLE_TRANSACTION` scope.
+        withoutAvsOnly:
+          type: boolean
+          description: If enabled, the limit will only take transactions without AVS
+            into account. This is specially useful for merchants who are looking for
+            a way to add thresholds for transactions that may lead to chargebacks.<br
+            />This filter only applies to limits within `SINGLE_TRANSACTION` scope.
+        currentValue:
+          type: number
+          description: The sum of all transactions performed by the terminal within
+            the period described in the `limitScope` attribute.<br />At the end of
+            each period, this value is reset.
+      description: List of terminal-level volume limits.
+    TerminalSettings:
+      required:
+      - allowDigitalWalletPayload
+      - allowEdcc
+      - allowEmcp
+      - allowEmvPayload
+      - allowKeyedPayload
+      - allowMagStripePayload
+      - allowMoto
+      - allowMulticurrency
+      - allowPartialRefund
+      - allowPos
+      - allowPreAuthorization
+      - allowRecurring
+      - allowSecureCredentials
+      - allowUnreferencedRefund
+      - allowWeb
+      - automaticSettle
+      - forceUniqueOrderId
+      type: object
+      properties:
+        allowWeb:
+          type: boolean
+          description: Indicates whether the terminal is configured to process Internet-based
+            transactions.
+        allowPos:
+          type: boolean
+          description: Indicates whether the terminal is configured to process POS-based
+            (Cardholder Present) transactions.
+        allowMoto:
+          type: boolean
+          description: Indicates whether the terminal is configured to process Mail
+            Order / Telephone Order transactions.
+        allowEmcp:
+          type: boolean
+          description: Indicates whether the terminal supports eCommerce Multi-Currency
+            Processing.
+        allowEdcc:
+          type: boolean
+          description: Indicates whether the terminal supports eCommerce Dynamic Currency
+            Conversion.
+        allowMulticurrency:
+          type: boolean
+          description: Indicates whether the terminal supports multi-currency processing.
+        allowRecurring:
+          type: boolean
+          description: Indicates whether the terminal allows recurring payments.
+        allowPreAuthorization:
+          type: boolean
+          description: Indicates whether the terminal allows pre-authorizations.<br
+            />This type of transactions need to be complemented with a capture operation
+            which can be done for a partial as well as a full amount.
+        allowPartialRefund:
+          type: boolean
+          description: Indicates whether the terminal allows partial refunds.
+        allowUnreferencedRefund:
+          type: boolean
+          description: Indicates whether the terminal allows unreferenced refunds.<br
+            />This type of refunds do not require a prior payment transaction to be
+            referenced.
+        allowDigitalWalletPayload:
+          type: boolean
+          description: Indicates whether the terminal is able to handle card payloads
+            from digital wallet applications.<br />Worldnet supports Apple Pay and
+            Google Pay digital wallets.
+        allowEmvPayload:
+          type: boolean
+          description: Indicates whether the terminal is able to handle card payloads
+            from EMV devices.
+        allowKeyedPayload:
+          type: boolean
+          description: Indicates whether the terminal is able to handle manually keyed
+            card details.
+        allowMagStripePayload:
+          type: boolean
+          description: Indicates whether the terminal is able to handle card payloads
+            from MSR devices.
+        allowSecureCredentials:
+          type: boolean
+          description: Indicates whether the terminal supports secure credentials
+            which is the Worldnet's tokenization mechanism for cards and accounts.
+        forceUniqueOrderId:
+          type: boolean
+          description: Indicates whether the terminal accepts duplicate order identifiers.<br
+            />An order is considered a duplicate when there is already another approved
+            transaction sitting in the open batch with the same identifier.
+        automaticSettle:
+          type: boolean
+          description: If enabled, the terminal's transactions will be automatically
+            cleared and settled based on the cut-off time in `batchTime` property.
+        batchTime:
+          type: string
+          description: Time that defines the end-of-day closing for the terminal.<br
+            />When in manual mode, merchants must send a `endOfDay` request in order
+            to indicate that transactions performed prior to that moment are eligible
+            to be cleared in the next settlement run.
+        timeZone:
+          type: string
+          description: Terminal's preferred time-zone.
+      description: Terminal settings and capabilities.
+    TerminalTax:
+      required:
+      - name
+      - rate
+      type: object
+      properties:
+        uniqueReference:
+          maxLength: 10
+          minLength: 10
+          type: string
+          description: Unique reference number assigned by Worldnet. This field must
+            be used when trying to update an existing terminal's tax.
+        name:
+          type: string
+          description: Tax Name.
+        rate:
+          maximum: 100
+          exclusiveMaximum: false
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
+          description: The ratio expressed as a percentage at which a transaction
+            is taxed.
+          format: double
+      description: List of supported taxes.
+    TerminalTip:
+      required:
+      - type
+      type: object
+      properties:
+        uniqueReference:
+          maxLength: 10
+          minLength: 10
+          type: string
+          description: Unique reference number assigned by Worldnet. This field must
+            be used when trying to update an existing terminal's tip.
+        type:
+          type: string
+          enum:
+          - PERCENTAGE
+          - FIXED_AMOUNT
+        currency:
+          type: string
+          description: Currency associated with the tip. This is specially useful
+            for multi-currency terminals in order to provide a different set of tips
+            for each supported currency.
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - SSP
+          - STD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - USS
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VES
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWL
         amount:
           minimum: 0
           exclusiveMinimum: true
           type: number
+          description: This field must used when the tip is of type `FIXED_AMOUNT`.
+            Otherwise, refer to the `percentage` property instead.
         percentage:
           maximum: 100
           exclusiveMaximum: false
           minimum: 0
           exclusiveMinimum: true
           type: number
+          description: This field must used when the tip is of type `PERCENTAGE`.
+            Otherwise, refer to the `amount` property instead.
           format: double
       description: List of pre-filled tips.
     UpdateTerminalRequest:
@@ -1597,77 +1815,48 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TerminalTax'
-    TerminalCompact:
-      required:
-        - paymentProcessor
-        - terminalNumber
-      type: object
-      properties:
-        terminalNumber:
-          maxLength: 50
-          minLength: 1
-          type: string
-          description: Unique number assigned by Worldnet.
-        paymentProcessor:
-          maxLength: 128
-          minLength: 1
-          type: string
-          description: The financial entity that will process and authorise the operations performed by the terminal.
-        displayName:
-          maxLength: 24
-          minLength: 0
-          type: string
-          description: Friendly name assigned by the merchant.
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-    TerminalPaginatedResult:
-      required:
-        - data
-        - totalCount
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TerminalCompact'
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-        totalCount:
-          type: integer
-          format: int64
     DeviceType:
       required:
-        - type
+      - type
       type: object
       properties:
         type:
           maxLength: 30
           minLength: 1
           type: string
+          description: Type of device.
         manufacturer:
           maxLength: 24
           minLength: 0
           type: string
+          description: Company responsible for manufacturing the devices of this type.
         supportsMagStripe:
           type: boolean
-        supportsKeyed:
-          type: boolean
-        supportsContactless:
-          type: boolean
-        supportsPinEntry:
-          type: boolean
+          description: Indicates whether this type of device is capable of performing
+            card swipes.
         supportsIcc:
           type: boolean
+          description: Indicates whether this type of device is capable of reading
+            card chips.
+        supportsKeyed:
+          type: boolean
+          description: Indicates whether this type of device is capable of accepting
+            keyed inputs.
+        supportsContactless:
+          type: boolean
+          description: Indicates whether this type of device is capable of performing
+            contactless transactions.
+        supportsPinEntry:
+          type: boolean
+          description: Indicates whether this type of device is capable of accepting
+            PIN entry.
         supportsOutputPrinting:
           type: boolean
+          description: Indicates whether this type of device is capable of printing.
         supportsOutputDisplaying:
           type: boolean
+          description: Indicates whether this type of device is capable of displaying
+            information.
         applications:
           type: array
           items:
@@ -1696,9 +1885,9 @@ components:
         matchType:
           type: string
           enum:
-            - FULL
-            - PARTIAL_VISA
-            - PARTIAL_EUROPAY
+          - FULL
+          - PARTIAL_VISA
+          - PARTIAL_EUROPAY
     EmvCertificate:
       type: object
       properties:
@@ -1710,8 +1899,8 @@ components:
           type: string
     EmvTag:
       required:
-        - hex
-        - value
+      - hex
+      - value
       type: object
       properties:
         decimal:
@@ -1725,8 +1914,8 @@ components:
           type: string
     DevicePaginatedResult:
       required:
-        - data
-        - totalCount
+      - data
+      - totalCount
       type: object
       properties:
         data:
@@ -1743,17 +1932,19 @@ components:
           format: int64
     DeviceTypeCompact:
       required:
-        - type
+      - type
       type: object
       properties:
         type:
           maxLength: 30
           minLength: 1
           type: string
+          description: Type of device.
         manufacturer:
           maxLength: 24
           minLength: 0
           type: string
+          description: Company responsible for manufacturing the devices of this type.
         links:
           uniqueItems: true
           type: array
@@ -1772,16 +1963,16 @@ components:
       scheme: bearer
       bearerFormat: JWT
 x-tagGroups:
-  - name: ACCOUNT API
-    tags:
-      - tokens
-      - settings
-  - name: CUSTOMER API
-    tags:
-      - balances
-      - credentials
-  - name: TRANSACTION API
-    tags:
-      - payments
-      - refunds
-      - transactions
+- name: ACCOUNT API
+  tags:
+  - tokens
+  - settings
+- name: CUSTOMER API
+  tags:
+  - balances
+  - credentials
+- name: TRANSACTION API
+  tags:
+  - payments
+  - refunds
+  - transactions
