@@ -392,6 +392,63 @@ paths:
         - account-api:full-access
         - account-api:ready-only
       x-position: "0"
+  /api/v1/customer/balances:
+    post:
+      tags:
+      - balances
+      summary: EBT Balance Inquiry
+      description: Performs a balance check on a given EBT Food Stamp / EBT Cash Benefits
+        account.
+      operationId: balanceInquiry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BalanceInquiryRequest'
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        4XX:
+          description: Client Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        5XX:
+          description: Server Error
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - customer-api:full-access
   /api/v1/account/terminals/{terminalNumber}:
     get:
       tags:
@@ -769,7 +826,7 @@ components:
         debugIdentifier:
           type: string
           description: Clients should use this field when communicating to our support
-            team.It allows us to easily identify the request and consequently the
+            team. It allows us to easily identify the request and consequently the
             reason behind its failure.
         details:
           uniqueItems: true
@@ -822,65 +879,6 @@ components:
           type: object
           description: Here the server gives a hint of how the client should fix the
             issue.
-    HypermediaLink:
-      type: object
-      properties:
-        rel:
-          type: string
-          description: Keyword that represents the action that the link is supposed
-            to perform.
-        method:
-          type: string
-          description: The HTTP method or verb.
-          example: POST
-        href:
-          type: string
-          description: The actual request URL.
-    TerminalCompact:
-      required:
-      - paymentProcessor
-      - terminalNumber
-      type: object
-      properties:
-        terminalNumber:
-          maxLength: 50
-          minLength: 1
-          type: string
-          description: Unique number assigned by Worldnet.
-        paymentProcessor:
-          maxLength: 128
-          minLength: 1
-          type: string
-          description: The financial entity that will process and authorise the operations
-            performed by the terminal.
-        displayName:
-          maxLength: 24
-          minLength: 0
-          type: string
-          description: Friendly name assigned by the merchant.
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-    TerminalPaginatedResult:
-      required:
-      - data
-      - totalCount
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TerminalCompact'
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-        totalCount:
-          type: integer
-          format: int64
     Address:
       type: object
       properties:
@@ -888,28 +886,35 @@ components:
           maxLength: 50
           minLength: 0
           type: string
+          description: The first line of the address.<br />This field is used for
+            AVS checks along with `city` and `postalCode`.
         line2:
           maxLength: 50
           minLength: 0
           type: string
+          description: The second line of the address, if any.
         postalCode:
           maxLength: 50
           minLength: 0
           type: string
+          description: The address's postal code.
         city:
           maxLength: 128
           minLength: 0
           type: string
+          description: The city or town of the address.
         region:
           maxLength: 128
           minLength: 0
           type: string
+          description: The region within the address's city, if any.
         country:
           maxLength: 2
           minLength: 2
           type: string
-      description: Merchant's address. This information will appear on transaction
-        receipts.
+          description: The two-letter country code defined by [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+            standard.
+      description: The customer's shipping address.
     AvsCheck:
       required:
       - enabled
@@ -1038,6 +1043,20 @@ components:
             - N
             - P
             - U
+    HypermediaLink:
+      type: object
+      properties:
+        rel:
+          type: string
+          description: Keyword that represents the action that the link is supposed
+            to perform.
+        method:
+          type: string
+          description: The HTTP method or verb.
+          example: POST
+        href:
+          type: string
+          description: The actual request URL.
     MerchantDetails:
       required:
       - email
@@ -1176,7 +1195,8 @@ components:
         terminalCustomFields:
           type: array
           description: List of additional data fields that can be used when performing
-            transactions or storing secure credentials.
+            transactions or storing secure credentials.<br />For more information
+            about custom fields, see [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_custom_fields).
           items:
             $ref: '#/components/schemas/TerminalCustomField'
         supportedCards:
@@ -1432,7 +1452,8 @@ components:
           description: If enabled, it ensures that a transaction will never be processed
             without the custom field properly populated.
       description: List of additional data fields that can be used when performing
-        transactions or storing secure credentials.
+        transactions or storing secure credentials.<br />For more information about
+        custom fields, see [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_custom_fields).
     TerminalLevelLimit:
       required:
       - limitScope
@@ -1815,6 +1836,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TerminalTax'
+    DevicePaginatedResult:
+      required:
+      - data
+      - totalCount
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceTypeCompact'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+        totalCount:
+          type: integer
+          format: int64
+    DeviceTypeCompact:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          maxLength: 30
+          minLength: 1
+          type: string
+          description: Type of device.
+        manufacturer:
+          maxLength: 24
+          minLength: 0
+          type: string
+          description: Company responsible for manufacturing the devices of this type.
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
     DeviceType:
       required:
       - type
@@ -1903,16 +1962,45 @@ components:
       - value
       type: object
       properties:
+        hex:
+          type: string
+        value:
+          type: string
         decimal:
           type: integer
           format: int32
         description:
           type: string
-        hex:
+      description: The list of EMV tags. Not required unless the `tlv` field is not
+        sent.
+    TerminalCompact:
+      required:
+      - paymentProcessor
+      - terminalNumber
+      type: object
+      properties:
+        terminalNumber:
+          maxLength: 50
+          minLength: 1
           type: string
-        value:
+          description: Unique number assigned by Worldnet.
+        paymentProcessor:
+          maxLength: 128
+          minLength: 1
           type: string
-    DevicePaginatedResult:
+          description: The financial entity that will process and authorise the operations
+            performed by the terminal.
+        displayName:
+          maxLength: 24
+          minLength: 0
+          type: string
+          description: Friendly name assigned by the merchant.
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    TerminalPaginatedResult:
       required:
       - data
       - totalCount
@@ -1921,7 +2009,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/DeviceTypeCompact'
+            $ref: '#/components/schemas/TerminalCompact'
         links:
           uniqueItems: true
           type: array
@@ -1930,26 +2018,1104 @@ components:
         totalCount:
           type: integer
           format: int64
-    DeviceTypeCompact:
+    AccountBalance:
       required:
-      - type
+      - amount
+      - benefitCategory
+      - currency
+      type: object
+      properties:
+        benefitCategory:
+          type: string
+          enum:
+          - CASH
+          - FOOD_STAMP
+        currency:
+          type: string
+          description: The 3-Letter Currency Code.
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - SSP
+          - STD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - USS
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VES
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWL
+        amount:
+          type: number
+          description: Current balance amount.
+      description: List of balance results per benefit category.
+    Balance:
+      required:
+      - terminal
+      type: object
+      properties:
+        terminal:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The terminal number assigned by Worldnet. This field indicates
+            the terminal responsible for processing the transaction.
+        operator:
+          maxLength: 50
+          minLength: 0
+          type: string
+          description: The operator who initiated the transaction. If not sent in
+            the request, Worldnet automatically fills this field with the API Key
+            alias.
+        dateTime:
+          type: string
+          description: Merchant date/time. If not sent in the request, Worldnet automatically
+            fills this field with the current date/time.<br />The format expected
+            for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
+            specification.
+          format: date-time
+        transactionResult:
+          $ref: '#/components/schemas/TransactionResult'
+        accountBalances:
+          type: array
+          description: List of balance results per benefit category.
+          items:
+            $ref: '#/components/schemas/AccountBalance'
+    TransactionResult:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of the generated transaction.
+          enum:
+          - SALE
+          - PREAUTH
+          - COMPLETION
+          - REFUND
+          - OFFLINE_DECLINE
+          - WITHDRAWAL
+        status:
+          type: string
+          description: The status of the generated transaction.
+          enum:
+          - READY
+          - PENDING
+          - VOID
+          - DECLINED
+          - COMPLETE
+          - REFERRAL
+          - PICKUP
+          - REVERSAL
+          - SENT
+          - ADMIN
+          - EXPIRED
+          - ACCEPTED
+          - REVIEW
+          - OTHER
+        approvalCode:
+          maxLength: 48
+          minLength: 0
+          type: string
+          description: The authorisation code assigned by the payment processor for
+            approved transactions.
+        currency:
+          type: string
+          description: The 3-Letter Currency Code.
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - SSP
+          - STD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - USS
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VES
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWL
+        authorisedAmount:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          description: The amount authorised by the payment processor.<br />For partial
+            authorisations, this amount will be lower than the actual amount sent
+            in the request.
+        resultCode:
+          type: string
+          description: |-
+            Worldnet maps result codes sent by different payment processors into a smaller set of codes as shown below. The original result code may be available in the `processorResultCode` field.
+
+            - **A**: Approved / Authorised.
+            - **D**: Declined / Not Authorised.
+            - **E**: Accepted for later processing, but result currently unknown.
+            - **P**: Only a portion of the original amount requested was authorised.
+            - **R**: Issuer has declined the transaction and indicated that the customer should contact their bank.
+            - **C**: Issuer has declined the transaction and requested that the card be retained as it may have been reported as lost or stolen.
+          enum:
+          - A
+          - D
+          - E
+          - P
+          - R
+          - C
+        resultMessage:
+          type: string
+          description: A brief description send by the processor about the transaction
+            result.<br />Clients must use this description in order to understand
+            the cause of rejections and declines.
+        processorResultCode:
+          type: string
+          description: The original result code sent by the payment processor.
+        credentialsMerchantReference:
+          type: string
+          description: |-
+            Reference to the credentials which were automatically stored based on the payment details.<br />Client applications must store this reference to be able to [retrieve](#operation/getCredentials), [update](#operation/updateCredentials) or [delete](#operation/deleteCredentials) the credentials in the future.
+
+            **Note:** Automatic tokenisation feature is optional and it is not available for all accounts. Therefore, merchants who are interested in having this feature must get in touch with Worldnet to check its availability.
+      description: |-
+        The result details of the transaction between Worldnet and the payment provider.<br />The important fields for balance responses that clients must be able to handle are `resultCode` and `resultMessage`
+
+        For the full list of response codes, see [Transaction Responses](https://docs.worldnettps.com/doku.php?id=merchant:existing_merchant:other_information:transaction_responses).
+    BalanceInquiryRequest:
+      required:
+      - currency
+      - customerAccount
+      - terminal
+      type: object
+      properties:
+        terminal:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: The terminal number assigned by Worldnet. This field indicates
+            the terminal responsible for processing the transaction.
+        operator:
+          maxLength: 50
+          minLength: 0
+          type: string
+          description: The operator who initiated the transaction. If not sent in
+            the request, Worldnet automatically fills this field with the API Key
+            alias.
+        dateTime:
+          type: string
+          description: |-
+            Merchant date/time. If not sent in the request, Worldnet automatically fills this field with the current date/time.
+
+            The format expected for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) specification.
+          format: date-time
+        currency:
+          type: string
+          description: The 3-Letter Currency Code.
+          enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - SSP
+          - STD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - USS
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VES
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XCD
+          - XOF
+          - XPF
+          - YER
+          - ZAR
+          - ZMW
+          - ZWL
+        customer:
+          $ref: '#/components/schemas/Customer'
+        customerAccount:
+          $ref: '#/components/schemas/Payload'
+    Customer:
+      type: object
+      properties:
+        firstName:
+          maxLength: 60
+          minLength: 0
+          type: string
+          description: The customer's first name.
+        lastName:
+          maxLength: 60
+          minLength: 0
+          type: string
+          description: The customer's last name.
+        fullName:
+          maxLength: 255
+          minLength: 0
+          type: string
+          description: The customer's full name.
+        gender:
+          type: string
+          description: The customer's gender.
+          enum:
+          - MALE
+          - FEMALE
+          - TRANSGENDER
+          - NON_BINARY
+          - NOT_STATED
+        birthYear:
+          type: integer
+          description: The customer's birth year.
+          format: int32
+        phone:
+          type: string
+          description: The buyer's contact phone number.<br />If **SMS Cardholder
+            Receipts** feature is enabled in the terminal, Worldnet will use this
+            number to automatically send the receipts of eventual transactions.
+        notificationEmail:
+          type: string
+          description: The buyer's contact email address.<br />If **Email Cardholder
+            Receipt** feature is enabled in the terminal, Worldnet will use this address
+            to automatically send the receipts of eventual transactions.
+        notificationLanguage:
+          maxLength: 2
+          minLength: 2
+          type: string
+          description: The customer's preferred notification language.<br />The two-letter
+            language code defined by the [ISO 639-1 alpha-2](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            standard.
+          enum:
+          - en
+          - fr
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+      description: Customer details.
+    Device:
+      required:
+      - dataKsn
       type: object
       properties:
         type:
           maxLength: 30
-          minLength: 1
-          type: string
-          description: Type of device.
-        manufacturer:
-          maxLength: 24
           minLength: 0
           type: string
-          description: Company responsible for manufacturing the devices of this type.
-        links:
-          uniqueItems: true
+        dataKsn:
+          type: string
+        serialNumber:
+          type: string
+        category:
+          type: string
+          enum:
+          - ATTENDED
+          - UNATTENDED
+      description: Information about the POS device used to capture the card details.
+    DigitalWalletPayload:
+      required:
+      - encryptedData
+      - payloadType
+      - serviceProvider
+      type: object
+      properties:
+        payloadType:
+          type: string
+        serviceProvider:
+          type: string
+          description: The wallet application provider.
+          enum:
+          - GOOGLE
+          - APPLE
+        cardholderName:
+          maxLength: 50
+          minLength: 0
+          type: string
+          description: The cardholder's name as it appears on the card.
+        encryptedData:
+          maxLength: 20480
+          minLength: 128
+          type: string
+          description: The encrypted data generated by the digital wallet application.
+        accountType:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          default: CHECKING
+    DukptPinDetails:
+      required:
+      - pin
+      - pinKsn
+      type: object
+      properties:
+        pin:
+          type: string
+        pinKsn:
+          type: string
+      description: PIN details.
+    EbtDetails:
+      required:
+      - benefitCategory
+      type: object
+      properties:
+        benefitCategory:
+          type: string
+          enum:
+          - CASH
+          - FOOD_STAMP
+        withdrawal:
+          type: boolean
+      description: EBT details, only required for electronic-benefit-transfer transactions.
+    EmvPayload:
+      required:
+      - device
+      - payloadType
+      type: object
+      properties:
+        payloadType:
+          type: string
+        downgradeTo:
+          type: string
+          description: This field gives clients the ability to reprocess offline transactions
+            that were not approved initially in a different entry mode.<br />For instance,
+            `EMV` transactions are allowed to be downgraded to `MAG_STRIPE` or `KEYED`.
+          enum:
+          - MAG_STRIPE
+          - KEYED
+        device:
+          $ref: '#/components/schemas/Device'
+        tlv:
+          type: string
+          description: The EMV tags in TLV (Tag-Length-Value) format.<br />For clients
+            not familiar with this format, the API also offer the possibility of sending
+            the list of tags in the `tags` fields.
+        tags:
           type: array
+          description: The list of EMV tags. Not required unless the `tlv` field is
+            not sent.
           items:
-            $ref: '#/components/schemas/HypermediaLink'
+            $ref: '#/components/schemas/EmvTag'
+        firstDigitOfPan:
+          maxLength: 1
+          minLength: 1
+          type: string
+          description: The first digit of the primary account number (PAN) / card
+            number.
+        cardholderSignature:
+          type: string
+          description: Cardholder's signature in the format described in the [Special
+            Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_signature_field_format)
+            section.
+        contactless:
+          type: boolean
+          description: Indicates that the card details were captured by a contactless
+            reader.
+        ebtDetails:
+          $ref: '#/components/schemas/EbtDetails'
+        accountType:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          default: CHECKING
+    FullyEncryptedKeyedDataFormat:
+      required:
+      - device
+      - encryptedData
+      type: object
+      properties:
+        dataFormat:
+          type: string
+          default: PLAIN_TEXT
+        device:
+          $ref: '#/components/schemas/Device'
+        encryptedData:
+          type: string
+          description: The full card data encrypted by the device.
+        firstDigitOfPan:
+          maxLength: 1
+          minLength: 1
+          type: string
+          description: The first digit of the primary account number (PAN) / card
+            number.
+    KeyedDataFormat:
+      type: object
+      properties:
+        dataFormat:
+          type: string
+          default: PLAIN_TEXT
+      description: 'The card details which can be sent in these three different formats:
+        `PLAIN_TEXT` (Default, if not specified), `FULLY_ENCRYPTED`, `PARTIALLY_ENCRYPTED`'
+      discriminator:
+        propertyName: dataFormat
+        mapping:
+          PLAIN_TEXT: '#/components/schemas/PlainTextKeyedDataFormat'
+          FULLY_ENCRYPTED: '#/components/schemas/FullyEncryptedKeyedDataFormat'
+          PARTIALLY_ENCRYPTED: '#/components/schemas/PartiallyEncryptedKeyedDataFormat'
+    KeyedPayload:
+      required:
+      - cardDetails
+      - payloadType
+      type: object
+      properties:
+        payloadType:
+          type: string
+        cardholderName:
+          maxLength: 50
+          minLength: 0
+          type: string
+          description: The cardholder's name as it appears on the card.
+        cardDetails:
+          $ref: '#/components/schemas/KeyedDataFormat'
+        pinDetails:
+          $ref: '#/components/schemas/DukptPinDetails'
+        ebtDetails:
+          $ref: '#/components/schemas/EbtDetails'
+        accountType:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          default: CHECKING
+    MagStripePayload:
+      required:
+      - device
+      - encryptedData
+      - payloadType
+      type: object
+      properties:
+        payloadType:
+          type: string
+        downgradeTo:
+          type: string
+          description: This field gives clients the ability to reprocess offline transactions
+            that were not approved initially in a different entry mode.<br />For instance,
+            `MAG_STRIPE` transactions are allowed to be downgraded to `KEYED`.
+          enum:
+          - MAG_STRIPE
+          - KEYED
+        device:
+          $ref: '#/components/schemas/Device'
+        encryptedData:
+          type: string
+          description: The encrypted data captured by the magnetic stripe reader.
+        additionalTlvData:
+          type: string
+          description: Additional TLV (Tag-Length-Value) data which is sometimes required
+            for contactless transactions.
+        firstDigitOfPan:
+          maxLength: 1
+          minLength: 1
+          type: string
+          description: The first digit of the primary account number (PAN) / card
+            number.
+        cardholderName:
+          maxLength: 50
+          minLength: 0
+          type: string
+          description: The cardholder's name as it appears on the card.
+        cardholderSignature:
+          type: string
+          description: Cardholder's signature in the format described in the [Special
+            Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_signature_field_format)
+            section.
+        contactless:
+          type: boolean
+          description: Indicates that the card details were captured by a contactless
+            reader.
+        fallback:
+          type: boolean
+          description: Indicates that the chip of the card could not be read due to
+            a technical issue which resulted in the technology “falling back” to a
+            magnetic stripe transaction.
+        fallbackReason:
+          type: string
+          description: The reason that caused the fallback.
+          enum:
+          - TECHNICAL
+          - EMPTY_CANDIDATE_LIST
+        pinDetails:
+          $ref: '#/components/schemas/DukptPinDetails'
+        ebtDetails:
+          $ref: '#/components/schemas/EbtDetails'
+        accountType:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          default: CHECKING
+    PartiallyEncryptedKeyedDataFormat:
+      required:
+      - device
+      - encryptedPan
+      - expiryDate
+      - maskedPan
+      type: object
+      properties:
+        dataFormat:
+          type: string
+          default: PLAIN_TEXT
+        device:
+          $ref: '#/components/schemas/Device'
+        encryptedPan:
+          type: string
+          description: The primary account number (PAN) / card number encrypted by
+            the device.
+        maskedPan:
+          maxLength: 19
+          minLength: 12
+          type: string
+          description: 'The card number masked with the character `*`.<br />According
+            to PCI DSS, only the first six and last four digits may be displayed.
+            For example: `548010******5929`'
+        expiryDate:
+          pattern: '[0-9]{4}'
+          type: string
+          description: The card's expiration date in the format `MMYY`.
+        cvv:
+          pattern: '[0-9]{3,4}'
+          type: string
+          description: The card's security code.
+        issueNumber:
+          pattern: '[0-9]{1,2}'
+          type: string
+          description: The card's issue number.
+    Payload:
+      required:
+      - payloadType
+      type: object
+      properties:
+        accountType:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          default: CHECKING
+        payloadType:
+          type: string
+      description: 'Payload that carries the customer''s card details.<br />Worldnet
+        currently supports the following types of payloads for balance inquiries:
+        [`EMV`, `KEYED`, `MAG_STRIPE`]'
+      discriminator:
+        propertyName: payloadType
+        mapping:
+          EMV: '#/components/schemas/EmvPayload'
+          KEYED: '#/components/schemas/KeyedPayload'
+          MAG_STRIPE: '#/components/schemas/MagStripePayload'
+          DIGITAL_WALLET: '#/components/schemas/DigitalWalletPayload'
+          SECURE_CREDENTIALS: '#/components/schemas/SecureCredentialsPayload'
+    PlainTextKeyedDataFormat:
+      required:
+      - cardNumber
+      - expiryDate
+      type: object
+      properties:
+        dataFormat:
+          type: string
+          default: PLAIN_TEXT
+        cardNumber:
+          maxLength: 19
+          minLength: 12
+          type: string
+          description: The card number, as a string without any separators.
+        expiryDate:
+          pattern: '[0-9]{4}'
+          type: string
+          description: The card's expiration date in the format `MMYY`.
+        cvv:
+          pattern: '[0-9]{3,4}'
+          type: string
+          description: The card's security code.
+        issueNumber:
+          pattern: '[0-9]{1,2}'
+          type: string
+          description: The card's issue number.
+    SecureCredentialsPayload:
+      required:
+      - credentialsNumber
+      - payloadType
+      type: object
+      properties:
+        payloadType:
+          type: string
+        credentialsNumber:
+          maxLength: 19
+          minLength: 12
+          type: string
+          description: The unique number assigned by Worldnet to represent the stored
+            credentials.
+        accountType:
+          type: string
+          enum:
+          - CHECKING
+          - SAVINGS
+          default: CHECKING
   securitySchemes:
     Basic:
       type: http
@@ -1959,7 +3125,7 @@ components:
     Bearer:
       type: http
       description: |
-        Use `Bearer` authentication scheme to prove your identity in order to access protected resources.
+        Use `Bearer` authentication scheme to prove your identity and access protected resources.
       scheme: bearer
       bearerFormat: JWT
 x-tagGroups:
