@@ -1,242 +1,189 @@
 openapi: 3.0.1
 info:
   title: Worldnet API
-  description: |
-    # Introduction
-    The Worldnet API enables you to connect seamlessly and securely to our [Omni-Channel Payments Platform](https://www.worldnetpayments.com/).
-
-    Our API's are built around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) principles and [OpenAPI Specification](https://www.openapis.org/) definitions.
-    Complying to such industry standards means that we can offer developers a much better experience by exposing predictable resource-oriented URL's as well as a comprehensive range of HTTP response codes and verbs.
-    Moreover, you have the possibility to enable and take full advantage of [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) controls in order to provide out-of-the-box `Discoverability` and `Functional-Awareness` for your integrations.
-
-    Get started on building full-featured payment applications and join us in the Revolution of Intelligent Retail.
-
-    # Authentication
-    The Worldnet API uses a combination of API Keys and [Java Web Tokens (JWT)](https://jwt.io/) to authenticate requests. 
-    API Key's hold all the necessary information for issuing JWT access tokens which in turn are required to access protected resources and operations.
-    Therefore, before you can start making any calls, you must generate an API Key and use it to obtain access tokens.
-
-    Please, make yourself familiar with the following security schemes before proceeding:
-    <!-- ReDoc-Inject: <security-definitions> -->
-    ## Generating an API Key
-    In order to generate your first API Key you must [sign up](#) for a developer account and follow the steps below:
-    1. [Log into the SelfCare System](#) with the credentials you received in the welcome email.
-    2. Under *Settings*, navigate to *API Keys*, and then click the `NEW API KEY` button.
-    4. Enter an alias and set the permission modes for each Sub-API.
-    5. Select the terminals that you want the API Key to be allowed to operate.
-    6. Back on the list, choose the action `View Authentication Key` to be able to see your API Key.
-
-    ## Obtaining an Access Token
-    In order to obtain an access token you must use the [authenticate](#operation/authenticate) operation passing your API Key in the `HTTP Authorization` header with `Basic` authentication scheme.
-
-    In the snippet bellow we show how to achieve that using [cURL](https://github.com/curl/curl). However, if you are not familiar with command line tools we recommend [Postman](https://www.getpostman.com/).
-
-    ```
-    curl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \
-      -H "Authorization: Basic <Merchant API Key>"
-    ```
-
-    For every successful request you should receive a response just like the one bellow containing the information associated with your crendentials, such as hours to expiry and privileges.
-    Include the JWT Token from the `token` property in the `Authorization` header with `Bearer` authentication scheme for following requests in order to prove your identity and access protected resources.
-
-    ```
-    {
-        "audience": "devpayments.worldnettps.com",
-        "boundTo": "<Key Alias>",
-        "tokenType": "Bearer",
-        "token": "<JWT Token>",
-        "issuedAt": "<Issue Date>",
-        "expiresIn": "<Hours to Expiry>",
-        "enableHypermedia": true,
-        "roles": [
-
-        ],
-        "allowedTerminals": [
-
-        ]
-    }
-    ```
-
-    For security reasons, access tokens expire after a certain amount of time.
-    Therefore, your application must implement a mechanism to keep track of `issuedAt` and `expiresIn` values in order to decide the right moment to automatically request new tokens.
-
-    **Note:** Your application must not hard-code the lifespan of a token as the value of `expiresIn` property is subject to change without prior notice.
-
-    ## Making Authenticated Calls
-    Apart from the [authenticate](#operation/authenticate) operation, the entire API requires `Bearer` authentication scheme and expects a valid JWT token as proof of identity.
-    The [cURL](https://github.com/curl/curl) snippet bellow is an example of how to use your access token, in this specific case, to request the list of available terminals in your account.
-
-    ```
-    curl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=10 \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer <JWT Token>"
-    ```
-
-    **Note:** The API will issue a response with status `401 Unauthorized` for requests carrying an expired JWT.
-
-    # API Requests
-    We provide developers looking to integrate with our solutions with a full-featured **Sandbox**.
-
-    - Sandbox URL: https://devpayments.worldnettps.com/merchant
-
-    In order to perform actions on the API's resources you must combine your requests with the proper [HTTP Request Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).
-
-    The Worldnet API supports the following HTTP Methods which are sometimes referred as *HTTP Verbs*:
-
-    HTTP Method  | Description
-    ------------ | -------------
-    [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) | It requests a representation of the specified resource. Requests using `GET` are ready-only.
-    [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) | It is used to submit an entity to the specified resource, often causing a change in state on the server.
-    [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) | It is used to apply partial modifications to a resource.
-    [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) | It deletes / cancels / reverts the specified resource.
-
-    ## Request Identifiers
-    The Worldnet API assigns a unique identifier for every request that comes in. You can find your requests' identifiers either in the `X-Request-Id` header or in the Error field `debugIdentifier`.
-
-    Request ID's are part of an effort to speed troubleshooting by facilitating communication between clients and our support team.
-    Since we keep track of all request identifiers in our log files, you just need to inform the request's identifier when asking us to assist you with problems that might come up during your integrations.
-
-    ## Request Headers
-    HTTP Header  | Description
-    ------------ | -------------
-    [Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) | The response format expected by your application.<br />The Worldnet API only produces `application/json` response format.
-    [Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) | It advertises which languages the client is able to understand, and which locale variant is preferred.<br />The Worldnet API fully supports English `en` and French `fr` languages.
-    [Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) | The body format of the request your application is sending to the API.<br />The Worldnet API only consumes `application/json` content type.
-    [Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) | It must contain contain the credentials (API Key or JWT Access Token) to authenticate your application.<br />The API will issue a `401 Unauthorized` response with the `WWW-Authenticate` header attached if your application fails to use this header properly.
-
-    ## Partial Updates
-    Partial update requests are signaled with the HTTP method `PATCH`.
-    In order to perform partial updates, clients must specify only the properties that have changed.
-
-    **Note:** To clear the content of a property, supply an empty value.
-
-    ## Testing Requests
-    Eventually it will be necessary to perform some transactions.
-    For resources such as testing credit cards and simulated responses, see [Testing Resources](https://docs.worldnettps.com/doku.php?id=developer:integration_docs:testing-guide#testing_resources).
-
-    # API Responses
-    Client applications must be able to handle JSON body format as well as a range of [HTTP status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) when processing responses.
-    Some resources might also include contextual hypermedia links. We strongly recommend that clients use these links in order to request more information or perform additional actions on a given resource.
-
-    ## HTTP Status Codes
-    The Worldnet API has adopted a comprehensive range of status codes where `2XX` statuses are returned for successful requests and `4XX` or `5XX` for failed requests.
-
-    The full range of status codes supported by Worldnet:
-
-    HTTP Status Code  | Description
-    ----------------- | -------------
-    [200 OK](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) | Indicates that the request has succeeded.
-    [201 Created](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201) | Indicates that the request has succeeded and has led to the creation of a resource.
-    [204 No Content](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/204) | Indicates that the server successfully executed the method but returns no response body.<br />This status is sent especifically to respond to `DELETE` requests.
-    [400 Bad Request](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) | Indicates that the server cannot or will not process the request due to malformed request syntax or schema violation.
-    [401 Unauthorized](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401) | Indicates that the request has not been applied because it lacks valid authentication credentials.<br />This status is sent with a `WWW-Authenticate` header that contains information on how to authorize correctly.
-    [403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403) | Indicates that the server understood the request but refuses to authorize it due to the lack of permissions.<br />Re-authenticating will make no difference until the proper permissions and terminals are added to the API Key.
-    [404 Not Found](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404) | Indicates that the server cannot find the requested resource.
-    [405 Method Not Allowed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405) | Indicates that the request method is known by the server but is not supported by the target resource.
-    [406 Not Acceptable](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406) | Indicates that the server cannot produce a response matching the value from `Accept` header.
-    [415 Unsupported Media Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415) | Indicates that the server refuses to accept the request because the payload format described by the `Content-Type` is unsupported.
-    [422 Unprocessable Entity](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) | Indicates that the server understands the content type of the request entity, and the syntax of the request entity is correct, but it was unable to proceed due to semantic errors or failed business validations.
-    [500 Internal Server Error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) | Indicates that the server encountered an unexpected condition that prevented it from fulfilling the request.
-    [501 Not Implemented](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501) | Indicates that the server does not yetsupport the functionality required to fulfill the request, but might in the future.
-
-    ## Error Handling
-    For all errors Worldnet returns an error response body that includes additional details in the format below:
-
-    ```
-    {
-        "debugIdentifier": "ae6d75eb-381b-4a01-9f49-fdff12e3848b",
-        "details": [
-            {
-                "errorCode": "X_400_002",
-                "errorMessage": "Unable to deserialize value",
-                "source": {
-                    "location": "BODY",
-                    "resource": "TipType",
-                    "property": "type",
-                    "value": "VARIABLE",
-                    "expected": "Acceptable values: [PERCENTAGE, FIXED_AMOUNT]"
-                }
-            }
-        ]
-    }
-    ```
-
-    Error messages are intented to help developers to fix any problems that may come up during integration.<br />However, if you ever have a hard time troubleshooting an issue or even wish to make a suggestion, do not hesitate to [contact us](https://worldnettps.com/contact/).
-    Do not forget to send us the `debugIdentifier` along with your inquiries.
-
-    ## HATEOAS (Hypermedia Links)
-    [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) is a powerful mechanism when it comes to enabling self-discoverability, reducing invalid state transition calls and protecting your application against unexpected changes on resources URL's.
-
-    This snippet from a sample `payments` response shows the list of hypermedia controls that represent the operations available for the newly created payment resource.
-
-    ```
-    "links": [
-        {
-            "rel": "capture",
-            "method": "PATCH"
-            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/capture"
-        },
-        {
-            "rel": "refund",
-            "method": "POST"
-            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/refunds"
-        },
-        {
-            "rel": "update",
-            "method": "PATCH"
-            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
-        },
-        {
-            "rel": "self",
-            "method": "GET"
-            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
-        },
-        {
-            "rel": "reverse",
-            "method": "DELETE"
-            "href": "https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS"
-        }
-    ]
-    ```
-
-    # Pagination
-    Worldnet implements cursor-based pagination which is sometimes referred as continuation token pagination.
-    This pagination approach works by returning a pointer to a specific item in the dataset. On subsequent requests, the server returns results after the given pointer.
-
-    Clients don't need to worry about implementing complex pagination mechanism in their applications as Worldnet returns the total count and a hypermedia link that can be used to load more result for all paginated resources.
-    ```
-    "links": [
-        {
-            "rel": "next",
-            "method": "GET"
-            "href": "https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?next=CWY4XRGUUY"
-        }
-    ],
-    "totalCount": 2
-    ```
-
-    The default and maximum number of elements per page is `100`, but it can be changed by adding the query parameter `pageSize` to requests as follows:
-    ```
-    curl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=5 \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer <JWT Token>"
-    ```
-
-    **Note:** For performance reasons, the elements inside of a paginated list only represent a compact version of the resource listed.
-    In order to retrieve the full version of a given resource, client applications must make a subsequent request using the proper hypermedia link.
-
-    # Versioning
-    Versioning ensures that changes are backward compatible. The Worldnet API uses a major and minor version nomenclature to manage changes.
-
-    ## Major Versions
-    Major version numbers will reflect in the REST URL, for example `/api/v1/transaction/payments`.
-
-    Currently, **v1** is the only supported major version.
-    
-    ## Minor Versions
-    Minor and backward-compatible changes will be advertised via `X-API-Version` response header, for example `X-API-Version: 2020-01-01`.
-
-    Developers should use this header to keep track of new features and optimisations that might benefit their applications.
+  description: "# Introduction\nThe Worldnet API enables you to connect seamlessly\
+    \ and securely to our [Omni-Channel Payments Platform](https://www.worldnetpayments.com/).\n\
+    \nOur API's are built around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer)\
+    \ principles and [OpenAPI Specification](https://www.openapis.org/) definitions.\n\
+    Complying to such industry standards means that we can offer developers a much\
+    \ better experience by exposing predictable resource-oriented URL's as well as\
+    \ a comprehensive range of HTTP response codes and verbs.\nMoreover, you have\
+    \ the possibility to enable and take full advantage of [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS)\
+    \ controls to provide out-of-the-box `Discoverability` and `Functional-Awareness`\
+    \ for your integrations.\n\nGet started on building full-featured payment applications\
+    \ and join us in the Revolution of Intelligent Retail.\n\n# Authentication\nThe\
+    \ Worldnet API uses a combination of API Keys and [Java Web Tokens (JWT)](https://jwt.io/)\
+    \ to authenticate requests. \nAPI Key's hold all the necessary information for\
+    \ issuing JWT access tokens which in turn are required to access protected resources\
+    \ and operations.\nTherefore, before you can start making any calls, you must\
+    \ generate an API Key and use it to obtain access tokens.\n\nPlease, make yourself\
+    \ familiar with the following security schemes before proceeding:\n<!-- ReDoc-Inject:\
+    \ <security-definitions> -->\n## Generating an API Key\nIn order to generate your\
+    \ first API Key you must [sign up](#) for a developer account and follow the steps\
+    \ below:\n1. [Log into the SelfCare System](#) with the credentials you received\
+    \ in the welcome email.\n2. Under *Settings*, navigate to *API Keys*, and then\
+    \ click the `NEW API KEY` button.\n4. Enter an alias and set the permission modes\
+    \ for each Sub-API.\n5. Select the terminals that you want the API Key to be allowed\
+    \ to operate.\n6. Back on the list, choose the action `View Authentication Key`\
+    \ to be able to see your API Key.\n\n## Obtaining an Access Token\nIn order to\
+    \ obtain an access token you must use the [authenticate](#operation/authenticate)\
+    \ operation passing your API Key in the `HTTP Authorization` header with `Basic`\
+    \ authentication scheme.\n\nIn the snippet bellow we show how to achieve that\
+    \ using [cURL](https://github.com/curl/curl). However, if you are not familiar\
+    \ with command line tools we recommend [Postman](https://www.getpostman.com/).\n\
+    \n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate\
+    \ \\\n  -H \"Authorization: Basic <Merchant API Key>\"\n```\n\nFor every successful\
+    \ request you should receive a response just like the one bellow containing the\
+    \ information associated with your crendentials, such as hours to expiry and privileges.\n\
+    Include the JWT Token from the `token` property in the `Authorization` header\
+    \ with `Bearer` authentication scheme for following requests to prove your identity\
+    \ and access protected resources.\n\n```\n{\n    \"audience\": \"devpayments.worldnettps.com\"\
+    ,\n    \"boundTo\": \"<Key Alias>\",\n    \"tokenType\": \"Bearer\",\n    \"token\"\
+    : \"<JWT Token>\",\n    \"issuedAt\": \"<Issue Date>\",\n    \"expiresIn\": \"\
+    <Hours to Expiry>\",\n    \"enableHypermedia\": true,\n    \"roles\": [\n\n  \
+    \  ],\n    \"allowedTerminals\": [\n\n    ]\n}\n```\n\nFor security reasons, access\
+    \ tokens expire after a certain amount of time.\nTherefore, your application must\
+    \ implement a mechanism to keep track of `issuedAt` and `expiresIn` values in\
+    \ order to decide the right moment to automatically request new tokens.\n\n**Note:**\
+    \ Your application must not hard-code the lifespan of a token as the value of\
+    \ `expiresIn` property is subject to change without prior notice.\n\n## Making\
+    \ Authenticated Calls\nApart from the [authenticate](#operation/authenticate)\
+    \ operation, the entire API requires `Bearer` authentication scheme and expects\
+    \ a valid JWT token as proof of identity.\nThe [cURL](https://github.com/curl/curl)\
+    \ snippet bellow is an example of how to use your access token, in this specific\
+    \ case, to request the list of available terminals in your account.\n\n```\ncurl\
+    \ https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=10\
+    \ \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer\
+    \ <JWT Token>\"\n```\n\n**Note:** The API will issue a response with status `401\
+    \ Unauthorized` for requests carrying an expired JWT.\n\n# API Requests\nWe provide\
+    \ developers looking to integrate with our solutions with a full-featured **Sandbox**.\n\
+    \n- Sandbox URL: https://devpayments.worldnettps.com/merchant\n\nIn order to perform\
+    \ actions on the API's resources you must combine your requests with the proper\
+    \ [HTTP Request Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).\n\
+    \nThe Worldnet API supports the following HTTP Methods which are sometimes referred\
+    \ as *HTTP Verbs*:\n\nHTTP Method  | Description\n------------ | -------------\n\
+    [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) | It requests\
+    \ a representation of the specified resource. Requests using `GET` are ready-only.\n\
+    [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) | It is\
+    \ used to submit an entity to the specified resource, often causing a change in\
+    \ state on the server.\n[PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH)\
+    \ | It is used to apply partial modifications to a resource.\n[DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE)\
+    \ | It deletes / cancels / reverts the specified resource.\n\n## Request Identifiers\n\
+    The Worldnet API assigns a unique identifier for every request that comes in.\
+    \ You can find your requests' identifiers either in the `X-Request-Id` header\
+    \ or in the Error field `debugIdentifier`.\n\nRequest ID's are part of an effort\
+    \ to speed troubleshooting by facilitating communication between clients and our\
+    \ support team.\nSince we keep track of all request identifiers in our log files,\
+    \ you just need to inform the request's identifier when asking us to assist you\
+    \ with problems that might come up during your integrations.\n\n## Request Headers\n\
+    HTTP Header  | Description\n------------ | -------------\n[Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept)\
+    \ | The response format expected by your application.<br />The Worldnet API only\
+    \ produces `application/json` response format.\n[Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language)\
+    \ | It advertises which languages the client is able to understand, and which\
+    \ locale variant is preferred.<br />The Worldnet API fully supports English `en`\
+    \ and French `fr` languages.\n[Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type)\
+    \ | The body format of the request your application is sending to the API.<br\
+    \ />The Worldnet API only consumes `application/json` content type.\n[Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)\
+    \ | It must contain contain the credentials (API Key or JWT Access Token) to authenticate\
+    \ your application.<br />The API will issue a `401 Unauthorized` response with\
+    \ the `WWW-Authenticate` header attached if your application fails to use this\
+    \ header properly.\n\n## Partial Updates\nPartial update requests are signaled\
+    \ with the HTTP method `PATCH`.\nTo perform partial updates, clients must specify\
+    \ only the properties that have changed.\n\n**Note:** To clear the content of\
+    \ a property, supply an empty value.\n\n## Testing Requests\nEventually it will\
+    \ be necessary to perform some transactions.\nFor resources such as testing credit\
+    \ cards and simulated responses, see [Testing Resources](https://docs.worldnettps.com/doku.php?id=developer:integration_docs:testing-guide#testing_resources).\n\
+    \n# API Responses\nClient applications must be able to handle JSON body format\
+    \ as well as a range of [HTTP status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)\
+    \ when processing responses.\nSome resources might also include contextual hypermedia\
+    \ links. We strongly recommend that clients use these links to request more information\
+    \ or perform additional actions on a given resource.\n\n## HTTP Status Codes\n\
+    The Worldnet API has adopted a comprehensive range of status codes where `2XX`\
+    \ statuses are returned for successful requests and `4XX` or `5XX` for failed\
+    \ requests.\n\nThe full range of status codes supported by Worldnet:\n\nHTTP Status\
+    \ Code  | Description\n----------------- | -------------\n[200 OK](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200)\
+    \ | Indicates that the request has succeeded.\n[201 Created](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201)\
+    \ | Indicates that the request has succeeded and has led to the creation of a\
+    \ resource.\n[204 No Content](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/204)\
+    \ | Indicates that the server successfully executed the method but returns no\
+    \ response body.<br />This status is sent especifically to respond to `DELETE`\
+    \ requests.\n[400 Bad Request](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400)\
+    \ | Indicates that the server cannot or will not process the request due to malformed\
+    \ request syntax or schema violation.\n[401 Unauthorized](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401)\
+    \ | Indicates that the request has not been applied because it lacks valid authentication\
+    \ credentials.<br />This status is sent with a `WWW-Authenticate` header that\
+    \ contains information on how to authorize correctly.\n[403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403)\
+    \ | Indicates that the server understood the request but refuses to authorize\
+    \ it due to the lack of permissions.<br />Re-authenticating will make no difference\
+    \ until the proper permissions and terminals are added to the API Key.\n[404 Not\
+    \ Found](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404) | Indicates\
+    \ that the server cannot find the requested resource.\n[405 Method Not Allowed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405)\
+    \ | Indicates that the request method is known by the server but is not supported\
+    \ by the target resource.\n[406 Not Acceptable](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406)\
+    \ | Indicates that the server cannot produce a response matching the value from\
+    \ `Accept` header.\n[415 Unsupported Media Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415)\
+    \ | Indicates that the server refuses to accept the request because the payload\
+    \ format described by the `Content-Type` is unsupported.\n[422 Unprocessable Entity](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422)\
+    \ | Indicates that the server understands the content type of the request entity,\
+    \ and the syntax of the request entity is correct, but it was unable to proceed\
+    \ due to semantic errors or failed business validations.\n[500 Internal Server\
+    \ Error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) | Indicates\
+    \ that the server encountered an unexpected condition that prevented it from fulfilling\
+    \ the request.\n[501 Not Implemented](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501)\
+    \ | Indicates that the server does not yetsupport the functionality required to\
+    \ fulfill the request, but might in the future.\n\n## Error Handling\nFor all\
+    \ errors Worldnet returns an error response body that includes additional details\
+    \ in the format below:\n\n```\n{\n    \"debugIdentifier\": \"ae6d75eb-381b-4a01-9f49-fdff12e3848b\"\
+    ,\n    \"details\": [\n        {\n            \"errorCode\": \"X_400_002\",\n\
+    \            \"errorMessage\": \"Unable to deserialize value\",\n            \"\
+    source\": {\n                \"location\": \"BODY\",\n                \"resource\"\
+    : \"TipType\",\n                \"property\": \"type\",\n                \"value\"\
+    : \"VARIABLE\",\n                \"expected\": \"Acceptable values: [PERCENTAGE,\
+    \ FIXED_AMOUNT]\"\n            }\n        }\n    ]\n}\n```\n\nError messages are\
+    \ intented to help developers to fix any problems that may come up during integration.<br\
+    \ />However, if you ever have a hard time troubleshooting an issue or even wish\
+    \ to make a suggestion, do not hesitate to [contact us](https://worldnettps.com/contact/).\n\
+    Do not forget to send us the `debugIdentifier` along with your inquiries.\n\n\
+    ## HATEOAS (Hypermedia Links)\n[HATEOAS](https://en.wikipedia.org/wiki/HATEOAS)\
+    \ is a powerful mechanism when it comes to enabling self-discoverability, reducing\
+    \ invalid state transition calls and protecting your application against unexpected\
+    \ changes on resources URL's.\n\nThis snippet from a sample `payments` response\
+    \ shows the list of hypermedia controls that represent the operations available\
+    \ for the newly created payment resource.\n\n```\n\"links\": [\n    {\n      \
+    \  \"rel\": \"capture\",\n        \"method\": \"PATCH\"\n        \"href\": \"\
+    https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/capture\"\
+    \n    },\n    {\n        \"rel\": \"refund\",\n        \"method\": \"POST\"\n\
+    \        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/refunds\"\
+    \n    },\n    {\n        \"rel\": \"update\",\n        \"method\": \"PATCH\"\n\
+    \        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\
+    \n    },\n    {\n        \"rel\": \"self\",\n        \"method\": \"GET\"\n   \
+    \     \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\
+    \n    },\n    {\n        \"rel\": \"reverse\",\n        \"method\": \"DELETE\"\
+    \n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\
+    \n    }\n]\n```\n\n# Pagination\nWorldnet implements cursor-based pagination which\
+    \ is sometimes referred as continuation token pagination.\nThis pagination approach\
+    \ works by returning a pointer to a specific item in the dataset. On subsequent\
+    \ requests, the server returns results after the given pointer.\n\nClients don't\
+    \ need to worry about implementing complex pagination mechanism in their applications\
+    \ as Worldnet returns, for all paginated resources, the total count and a hypermedia\
+    \ link that can be used to load more results.\n```\n\"links\": [\n    {\n    \
+    \    \"rel\": \"next\",\n        \"method\": \"GET\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?next=CWY4XRGUUY\"\
+    \n    }\n],\n\"totalCount\": 2\n```\n\nThe default and maximum number of elements\
+    \ per page is `100`, but it can be changed by adding the query parameter `pageSize`\
+    \ to requests as follows:\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=5\
+    \ \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer\
+    \ <JWT Token>\"\n```\n\n**Note:** For performance reasons, the elements inside\
+    \ of a paginated list only represent a compact version of the resource listed.\n\
+    To retrieve the full version of a given resource, client applications must make\
+    \ a subsequent request using the proper hypermedia link.\n\n# Versioning\nVersioning\
+    \ ensures that changes are backward compatible. The Worldnet API uses a major\
+    \ and minor version nomenclature to manage changes.\n\n## Major Versions\nMajor\
+    \ version numbers will reflect in the REST URL, for example `/api/v1/transaction/payments`.\n\
+    \nCurrently, **v1** is the only supported major version.\n\n## Minor Versions\n\
+    Minor and backward-compatible changes will be advertised via `X-API-Version` response\
+    \ header, for example `X-API-Version: 2020-01-01`.\n\nDevelopers should use this\
+    \ header to keep track of new features and optimisations that might benefit their\
+    \ applications.\n"
   contact:
     name: Support Team
     url: https://worldnettps.com/contact/
@@ -2230,9 +2177,9 @@ components:
         dateTime:
           type: string
           description: Merchant date/time. If not sent in the request, Worldnet automatically
-            fills this field with the current date/time.<br />The format expected
-            for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
-            specification.
+            fills this field with the current date/time.<br />**Note:** The format
+            expected for date/time attributes in the API is described by the [ISO
+            8601](https://en.wikipedia.org/wiki/ISO_8601) specification.
           format: date-time
         transactionResult:
           $ref: '#/components/schemas/TransactionResult'
@@ -2521,7 +2468,7 @@ components:
           description: |-
             Merchant date/time. If not sent in the request, Worldnet automatically fills this field with the current date/time.
 
-            The format expected for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) specification.
+            **Note:** The format expected for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) specification.
           format: date-time
         currency:
           type: string
@@ -2816,8 +2763,13 @@ components:
       properties:
         pin:
           type: string
+          description: The PIN encrypted using [DUKPT](https://en.wikipedia.org/wiki/Derived_unique_key_per_transaction)
+            Scheme.
         pinKsn:
+          maxLength: 20
+          minLength: 20
           type: string
+          description: The key serial number.
       description: PIN details.
     EbtDetails:
       required:
@@ -2831,6 +2783,8 @@ components:
           - FOOD_STAMP
         withdrawal:
           type: boolean
+          description: Indicates a cash withdrawal request. This option is only available
+            for EBT cash benefits accounts.
       description: EBT details, only required for electronic-benefit-transfer transactions.
     EmvPayload:
       required:
