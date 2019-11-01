@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Worldnet API",
-    "description": "# Introduction\nThe Worldnet API enables you to connect seamlessly and securely to our [Omni-Channel Payments Platform](https://www.worldnetpayments.com/).\n\nOur API's are built around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) principles and [OpenAPI Specification](https://www.openapis.org/) definitions.\nComplying to such industry standards means that we can offer developers a much better experience by exposing predictable resource-oriented URL's as well as a comprehensive range of HTTP response codes and verbs.\nMoreover, you have the possibility to enable and take full advantage of [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) controls in order to provide out-of-the-box `Discoverability` and `Functional-Awareness` for your integrations.\n\nGet started on building full-featured payment applications and join us in the Revolution of Intelligent Retail.\n\n# Authentication\nThe Worldnet API uses a combination of API Keys and [Java Web Tokens (JWT)](https://jwt.io/) to authenticate requests. \nAPI Key's hold all the necessary information for issuing JWT access tokens which in turn are required to access protected resources and operations.\nTherefore, before you can start making any calls, you must generate an API Key and use it to obtain access tokens.\n\nPlease, make yourself familiar with the following security schemes before proceeding:\n<!-- ReDoc-Inject: <security-definitions> -->\n## Generating an API Key\nIn order to generate your first API Key you must [sign up](#) for a developer account and follow the steps below:\n1. [Log into the SelfCare System](#) with the credentials you received in the welcome email.\n2. Under *Settings*, navigate to *API Keys*, and then click the `NEW API KEY` button.\n4. Enter an alias and set the permission modes for each Sub-API.\n5. Select the terminals that you want the API Key to be allowed to operate.\n6. Back on the list, choose the action `View Authentication Key` to be able to see your API Key.\n\n## Obtaining an Access Token\nIn order to obtain an access token you must use the [authenticate](#operation/authenticate) operation passing your API Key in the `HTTP Authorization` header with `Basic` authentication scheme.\n\nIn the snippet bellow we show how to achieve that using [cURL](https://github.com/curl/curl). However, if you are not familiar with command line tools we recommend [Postman](https://www.getpostman.com/).\n\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \\\n  -H \"Authorization: Basic <Merchant API Key>\"\n```\n\nFor every successful request you should receive a response just like the one bellow containing the information associated with your crendentials, such as hours to expiry and privileges.\nInclude the JWT Token from the `token` property in the `Authorization` header with `Bearer` authentication scheme for following requests in order to prove your identity and access protected resources.\n\n```\n{\n    \"audience\": \"devpayments.worldnettps.com\",\n    \"boundTo\": \"<Key Alias>\",\n    \"tokenType\": \"Bearer\",\n    \"token\": \"<JWT Token>\",\n    \"issuedAt\": \"<Issue Date>\",\n    \"expiresIn\": \"<Hours to Expiry>\",\n    \"enableHypermedia\": true,\n    \"roles\": [\n\n    ],\n    \"allowedTerminals\": [\n\n    ]\n}\n```\n\nFor security reasons, access tokens expire after a certain amount of time.\nTherefore, your application must implement a mechanism to keep track of `issuedAt` and `expiresIn` values in order to decide the right moment to automatically request new tokens.\n\n**Note:** Your application must not hard-code the lifespan of a token as the value of `expiresIn` property is subject to change without prior notice.\n\n## Making Authenticated Calls\nApart from the [authenticate](#operation/authenticate) operation, the entire API requires `Bearer` authentication scheme and expects a valid JWT token as proof of identity.\nThe [cURL](https://github.com/curl/curl) snippet bellow is an example of how to use your access token, in this specific case, to request the list of available terminals in your account.\n\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=10 \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer <JWT Token>\"\n```\n\n**Note:** The API will issue a response with status `401 Unauthorized` for requests carrying an expired JWT.\n\n# API Requests\nWe provide developers looking to integrate with our solutions with a full-featured **Sandbox**.\n\n- Sandbox URL: https://devpayments.worldnettps.com/merchant\n\nIn order to perform actions on the API's resources you must combine your requests with the proper [HTTP Request Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).\n\nThe Worldnet API supports the following HTTP Methods which are sometimes referred as *HTTP Verbs*:\n\nHTTP Method  | Description\n------------ | -------------\n[GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) | It requests a representation of the specified resource. Requests using `GET` are ready-only.\n[POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) | It is used to submit an entity to the specified resource, often causing a change in state on the server.\n[PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) | It is used to apply partial modifications to a resource.\n[DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) | It deletes / cancels / reverts the specified resource.\n\n## Request Identifiers\nThe Worldnet API assigns a unique identifier for every request that comes in. You can find your requests' identifiers either in the `X-Request-Id` header or in the Error field `debugIdentifier`.\n\nRequest ID's are part of an effort to speed troubleshooting by facilitating communication between clients and our support team.\nSince we keep track of all request identifiers in our log files, you just need to inform the request's identifier when asking us to assist you with problems that might come up during your integrations.\n\n## Request Headers\nHTTP Header  | Description\n------------ | -------------\n[Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) | The response format expected by your application.<br />The Worldnet API only produces `application/json` response format.\n[Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) | It advertises which languages the client is able to understand, and which locale variant is preferred.<br />The Worldnet API fully supports English `en` and French `fr` languages.\n[Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) | The body format of the request your application is sending to the API.<br />The Worldnet API only consumes `application/json` content type.\n[Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) | It must contain contain the credentials (API Key or JWT Access Token) to authenticate your application.<br />The API will issue a `401 Unauthorized` response with the `WWW-Authenticate` header attached if your application fails to use this header properly.\n\n## Partial Updates\nPartial update requests are signaled with the HTTP method `PATCH`.\nIn order to perform partial updates, clients must specify only the properties that have changed.\n\n**Note:** To clear the content of a property, supply an empty value.\n\n## Testing Requests\nEventually it will be necessary to perform some transactions.\nFor resources such as testing credit cards and simulated responses, see [Testing Resources](https://docs.worldnettps.com/doku.php?id=developer:integration_docs:testing-guide#testing_resources).\n\n# API Responses\nClient applications must be able to handle JSON body format as well as a range of [HTTP status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) when processing responses.\nSome resources might also include contextual hypermedia links. We strongly recommend that clients use these links in order to request more information or perform additional actions on a given resource.\n\n## HTTP Status Codes\nThe Worldnet API has adopted a comprehensive range of status codes where `2XX` statuses are returned for successful requests and `4XX` or `5XX` for failed requests.\n\nThe full range of status codes supported by Worldnet:\n\nHTTP Status Code  | Description\n----------------- | -------------\n[200 OK](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) | Indicates that the request has succeeded.\n[201 Created](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201) | Indicates that the request has succeeded and has led to the creation of a resource.\n[204 No Content](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/204) | Indicates that the server successfully executed the method but returns no response body.<br />This status is sent especifically to respond to `DELETE` requests.\n[400 Bad Request](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) | Indicates that the server cannot or will not process the request due to malformed request syntax or schema violation.\n[401 Unauthorized](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401) | Indicates that the request has not been applied because it lacks valid authentication credentials.<br />This status is sent with a `WWW-Authenticate` header that contains information on how to authorize correctly.\n[403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403) | Indicates that the server understood the request but refuses to authorize it due to the lack of permissions.<br />Re-authenticating will make no difference until the proper permissions and terminals are added to the API Key.\n[404 Not Found](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404) | Indicates that the server cannot find the requested resource.\n[405 Method Not Allowed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405) | Indicates that the request method is known by the server but is not supported by the target resource.\n[406 Not Acceptable](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406) | Indicates that the server cannot produce a response matching the value from `Accept` header.\n[415 Unsupported Media Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415) | Indicates that the server refuses to accept the request because the payload format described by the `Content-Type` is unsupported.\n[422 Unprocessable Entity](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) | Indicates that the server understands the content type of the request entity, and the syntax of the request entity is correct, but it was unable to proceed due to semantic errors or failed business validations.\n[500 Internal Server Error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) | Indicates that the server encountered an unexpected condition that prevented it from fulfilling the request.\n[501 Not Implemented](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501) | Indicates that the server does not yetsupport the functionality required to fulfill the request, but might in the future.\n\n## Error Handling\nFor all errors Worldnet returns an error response body that includes additional details in the format below:\n\n```\n{\n    \"debugIdentifier\": \"ae6d75eb-381b-4a01-9f49-fdff12e3848b\",\n    \"details\": [\n        {\n            \"errorCode\": \"X_400_002\",\n            \"errorMessage\": \"Unable to deserialize value\",\n            \"source\": {\n                \"location\": \"BODY\",\n                \"resource\": \"TipType\",\n                \"property\": \"type\",\n                \"value\": \"VARIABLE\",\n                \"expected\": \"Acceptable values: [PERCENTAGE, FIXED_AMOUNT]\"\n            }\n        }\n    ]\n}\n```\n\nError messages are intented to help developers to fix any problems that may come up during integration.<br />However, if you ever have a hard time troubleshooting an issue or even wish to make a suggestion, do not hesitate to [contact us](https://worldnettps.com/contact/).\nDo not forget to send us the `debugIdentifier` along with your inquiries.\n\n## HATEOAS (Hypermedia Links)\n[HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) is a powerful mechanism when it comes to enabling self-discoverability, reducing invalid state transition calls and protecting your application against unexpected changes on resources URL's.\n\nThis snippet from a sample `payments` response shows the list of hypermedia controls that represent the operations available for the newly created payment resource.\n\n```\n\"links\": [\n    {\n        \"rel\": \"capture\",\n        \"method\": \"PATCH\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/capture\"\n    },\n    {\n        \"rel\": \"refund\",\n        \"method\": \"POST\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/refunds\"\n    },\n    {\n        \"rel\": \"update\",\n        \"method\": \"PATCH\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\n    },\n    {\n        \"rel\": \"self\",\n        \"method\": \"GET\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\n    },\n    {\n        \"rel\": \"reverse\",\n        \"method\": \"DELETE\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\n    }\n]\n```\n\n# Pagination\nWorldnet implements cursor-based pagination which is sometimes referred as continuation token pagination.\nThis pagination approach works by returning a pointer to a specific item in the dataset. On subsequent requests, the server returns results after the given pointer.\n\nClients don't need to worry about implementing complex pagination mechanism in their applications as Worldnet returns the total count and a hypermedia link that can be used to load more result for all paginated resources.\n```\n\"links\": [\n    {\n        \"rel\": \"next\",\n        \"method\": \"GET\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?next=CWY4XRGUUY\"\n    }\n],\n\"totalCount\": 2\n```\n\nThe default and maximum number of elements per page is `100`, but it can be changed by adding the query parameter `pageSize` to requests as follows:\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=5 \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer <JWT Token>\"\n```\n\n**Note:** For performance reasons, the elements inside of a paginated list only represent a compact version of the resource listed.\nIn order to retrieve the full version of a given resource, client applications must make a subsequent request using the proper hypermedia link.\n\n# Versioning\nVersioning ensures that changes are backward compatible. The Worldnet API uses a major and minor version nomenclature to manage changes.\n\n## Major Versions\nMajor version numbers will reflect in the REST URL, for example `/api/v1/transaction/payments`.\n\nCurrently, **v1** is the only supported major version.\n\n## Minor Versions\nMinor and backward-compatible changes will be advertised via `X-API-Version` response header, for example `X-API-Version: 2020-01-01`.\n\nDevelopers should use this header to keep track of new features and optimisations that might benefit their applications.\n",
+    "description": "# Introduction\nThe Worldnet API enables you to connect seamlessly and securely to our [Omni-Channel Payments Platform](https://www.worldnetpayments.com/).\n\nOur API's are built around [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) principles and [OpenAPI Specification](https://www.openapis.org/) definitions.\nComplying to such industry standards means that we can offer developers a much better experience by exposing predictable resource-oriented URL's as well as a comprehensive range of HTTP response codes and verbs.\nMoreover, you have the possibility to enable and take full advantage of [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) controls to provide out-of-the-box `Discoverability` and `Functional-Awareness` for your integrations.\n\nGet started on building full-featured payment applications and join us in the Revolution of Intelligent Retail.\n\n# Authentication\nThe Worldnet API uses a combination of API Keys and [Java Web Tokens (JWT)](https://jwt.io/) to authenticate requests. \nAPI Key's hold all the necessary information for issuing JWT access tokens which in turn are required to access protected resources and operations.\nTherefore, before you can start making any calls, you must generate an API Key and use it to obtain access tokens.\n\nPlease, make yourself familiar with the following security schemes before proceeding:\n<!-- ReDoc-Inject: <security-definitions> -->\n## Generating an API Key\nIn order to generate your first API Key you must [sign up](#) for a developer account and follow the steps below:\n1. [Log into the SelfCare System](#) with the credentials you received in the welcome email.\n2. Under *Settings*, navigate to *API Keys*, and then click the `NEW API KEY` button.\n4. Enter an alias and set the permission modes for each Sub-API.\n5. Select the terminals that you want the API Key to be allowed to operate.\n6. Back on the list, choose the action `View Authentication Key` to be able to see your API Key.\n\n## Obtaining an Access Token\nIn order to obtain an access token you must use the [authenticate](#operation/authenticate) operation passing your API Key in the `HTTP Authorization` header with `Basic` authentication scheme.\n\nIn the snippet bellow we show how to achieve that using [cURL](https://github.com/curl/curl). However, if you are not familiar with command line tools we recommend [Postman](https://www.getpostman.com/).\n\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \\\n  -H \"Authorization: Basic <Merchant API Key>\"\n```\n\nFor every successful request you should receive a response just like the one bellow containing the information associated with your crendentials, such as hours to expiry and privileges.\nInclude the JWT Token from the `token` property in the `Authorization` header with `Bearer` authentication scheme for following requests to prove your identity and access protected resources.\n\n```\n{\n    \"audience\": \"devpayments.worldnettps.com\",\n    \"boundTo\": \"<Key Alias>\",\n    \"tokenType\": \"Bearer\",\n    \"token\": \"<JWT Token>\",\n    \"issuedAt\": \"<Issue Date>\",\n    \"expiresIn\": \"<Hours to Expiry>\",\n    \"enableHypermedia\": true,\n    \"roles\": [\n\n    ],\n    \"allowedTerminals\": [\n\n    ]\n}\n```\n\nFor security reasons, access tokens expire after a certain amount of time.\nTherefore, your application must implement a mechanism to keep track of `issuedAt` and `expiresIn` values in order to decide the right moment to automatically request new tokens.\n\n**Note:** Your application must not hard-code the lifespan of a token as the value of `expiresIn` property is subject to change without prior notice.\n\n## Making Authenticated Calls\nApart from the [authenticate](#operation/authenticate) operation, the entire API requires `Bearer` authentication scheme and expects a valid JWT token as proof of identity.\nThe [cURL](https://github.com/curl/curl) snippet bellow is an example of how to use your access token, in this specific case, to request the list of available terminals in your account.\n\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=10 \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer <JWT Token>\"\n```\n\n**Note:** The API will issue a response with status `401 Unauthorized` for requests carrying an expired JWT.\n\n# API Requests\nWe provide developers looking to integrate with our solutions with a full-featured **Sandbox**.\n\n- Sandbox URL: https://devpayments.worldnettps.com/merchant\n\nIn order to perform actions on the API's resources you must combine your requests with the proper [HTTP Request Method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods).\n\nThe Worldnet API supports the following HTTP Methods which are sometimes referred as *HTTP Verbs*:\n\nHTTP Method  | Description\n------------ | -------------\n[GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) | It requests a representation of the specified resource. Requests using `GET` are ready-only.\n[POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) | It is used to submit an entity to the specified resource, often causing a change in state on the server.\n[PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) | It is used to apply partial modifications to a resource.\n[DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) | It deletes / cancels / reverts the specified resource.\n\n## Request Identifiers\nThe Worldnet API assigns a unique identifier for every request that comes in. You can find your requests' identifiers either in the `X-Request-Id` header or in the Error field `debugIdentifier`.\n\nRequest ID's are part of an effort to speed troubleshooting by facilitating communication between clients and our support team.\nSince we keep track of all request identifiers in our log files, you just need to inform the request's identifier when asking us to assist you with problems that might come up during your integrations.\n\n## Request Headers\nHTTP Header  | Description\n------------ | -------------\n[Accept](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept) | The response format expected by your application.<br />The Worldnet API only produces `application/json` response format.\n[Accept-Language](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) | It advertises which languages the client is able to understand, and which locale variant is preferred.<br />The Worldnet API fully supports English `en` and French `fr` languages.\n[Content-Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) | The body format of the request your application is sending to the API.<br />The Worldnet API only consumes `application/json` content type.\n[Authorization](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization) | It must contain contain the credentials (API Key or JWT Access Token) to authenticate your application.<br />The API will issue a `401 Unauthorized` response with the `WWW-Authenticate` header attached if your application fails to use this header properly.\n\n## Partial Updates\nPartial update requests are signaled with the HTTP method `PATCH`.\nTo perform partial updates, clients must specify only the properties that have changed.\n\n**Note:** To clear the content of a property, supply an empty value.\n\n## Testing Requests\nEventually it will be necessary to perform some transactions.\nFor resources such as testing credit cards and simulated responses, see [Testing Resources](https://docs.worldnettps.com/doku.php?id=developer:integration_docs:testing-guide#testing_resources).\n\n# API Responses\nClient applications must be able to handle JSON body format as well as a range of [HTTP status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) when processing responses.\nSome resources might also include contextual hypermedia links. We strongly recommend that clients use these links to request more information or perform additional actions on a given resource.\n\n## HTTP Status Codes\nThe Worldnet API has adopted a comprehensive range of status codes where `2XX` statuses are returned for successful requests and `4XX` or `5XX` for failed requests.\n\nThe full range of status codes supported by Worldnet:\n\nHTTP Status Code  | Description\n----------------- | -------------\n[200 OK](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200) | Indicates that the request has succeeded.\n[201 Created](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201) | Indicates that the request has succeeded and has led to the creation of a resource.\n[204 No Content](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/204) | Indicates that the server successfully executed the method but returns no response body.<br />This status is sent especifically to respond to `DELETE` requests.\n[400 Bad Request](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400) | Indicates that the server cannot or will not process the request due to malformed request syntax or schema violation.\n[401 Unauthorized](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401) | Indicates that the request has not been applied because it lacks valid authentication credentials.<br />This status is sent with a `WWW-Authenticate` header that contains information on how to authorize correctly.\n[403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403) | Indicates that the server understood the request but refuses to authorize it due to the lack of permissions.<br />Re-authenticating will make no difference until the proper permissions and terminals are added to the API Key.\n[404 Not Found](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404) | Indicates that the server cannot find the requested resource.\n[405 Method Not Allowed](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405) | Indicates that the request method is known by the server but is not supported by the target resource.\n[406 Not Acceptable](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/406) | Indicates that the server cannot produce a response matching the value from `Accept` header.\n[415 Unsupported Media Type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415) | Indicates that the server refuses to accept the request because the payload format described by the `Content-Type` is unsupported.\n[422 Unprocessable Entity](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422) | Indicates that the server understands the content type of the request entity, and the syntax of the request entity is correct, but it was unable to proceed due to semantic errors or failed business validations.\n[500 Internal Server Error](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) | Indicates that the server encountered an unexpected condition that prevented it from fulfilling the request.\n[501 Not Implemented](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501) | Indicates that the server does not yetsupport the functionality required to fulfill the request, but might in the future.\n\n## Error Handling\nFor all errors Worldnet returns an error response body that includes additional details in the format below:\n\n```\n{\n    \"debugIdentifier\": \"ae6d75eb-381b-4a01-9f49-fdff12e3848b\",\n    \"details\": [\n        {\n            \"errorCode\": \"X_400_002\",\n            \"errorMessage\": \"Unable to deserialize value\",\n            \"source\": {\n                \"location\": \"BODY\",\n                \"resource\": \"TipType\",\n                \"property\": \"type\",\n                \"value\": \"VARIABLE\",\n                \"expected\": \"Acceptable values: [PERCENTAGE, FIXED_AMOUNT]\"\n            }\n        }\n    ]\n}\n```\n\nError messages are intented to help developers to fix any problems that may come up during integration.<br />However, if you ever have a hard time troubleshooting an issue or even wish to make a suggestion, do not hesitate to [contact us](https://worldnettps.com/contact/).\nDo not forget to send us the `debugIdentifier` along with your inquiries.\n\n## HATEOAS (Hypermedia Links)\n[HATEOAS](https://en.wikipedia.org/wiki/HATEOAS) is a powerful mechanism when it comes to enabling self-discoverability, reducing invalid state transition calls and protecting your application against unexpected changes on resources URL's.\n\nThis snippet from a sample `payments` response shows the list of hypermedia controls that represent the operations available for the newly created payment resource.\n\n```\n\"links\": [\n    {\n        \"rel\": \"capture\",\n        \"method\": \"PATCH\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/capture\"\n    },\n    {\n        \"rel\": \"refund\",\n        \"method\": \"POST\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS/refunds\"\n    },\n    {\n        \"rel\": \"update\",\n        \"method\": \"PATCH\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\n    },\n    {\n        \"rel\": \"self\",\n        \"method\": \"GET\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\n    },\n    {\n        \"rel\": \"reverse\",\n        \"method\": \"DELETE\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/transaction/payments/GH2AERQEJS\"\n    }\n]\n```\n\n# Pagination\nWorldnet implements cursor-based pagination which is sometimes referred as continuation token pagination.\nThis pagination approach works by returning a pointer to a specific item in the dataset. On subsequent requests, the server returns results after the given pointer.\n\nClients don't need to worry about implementing complex pagination mechanism in their applications as Worldnet returns, for all paginated resources, the total count and a hypermedia link that can be used to load more results.\n```\n\"links\": [\n    {\n        \"rel\": \"next\",\n        \"method\": \"GET\"\n        \"href\": \"https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?next=CWY4XRGUUY\"\n    }\n],\n\"totalCount\": 2\n```\n\nThe default and maximum number of elements per page is `100`, but it can be changed by adding the query parameter `pageSize` to requests as follows:\n```\ncurl https://devpayments.worldnettps.com/merchant/api/v1/account/terminals?pageSize=5 \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer <JWT Token>\"\n```\n\n**Note:** For performance reasons, the elements inside of a paginated list only represent a compact version of the resource listed.\nTo retrieve the full version of a given resource, client applications must make a subsequent request using the proper hypermedia link.\n\n# Versioning\nVersioning ensures that changes are backward compatible. The Worldnet API uses a major and minor version nomenclature to manage changes.\n\n## Major Versions\nMajor version numbers will reflect in the REST URL, for example `/api/v1/transaction/payments`.\n\nCurrently, **v1** is the only supported major version.\n\n## Minor Versions\nMinor and backward-compatible changes will be advertised via `X-API-Version` response header, for example `X-API-Version: 2020-01-01`.\n\nDevelopers should use this header to keep track of new features and optimisations that might benefit their applications.\n",
     "contact": {
       "name": "Support Team",
       "url": "https://worldnettps.com/contact/",
@@ -39,7 +39,7 @@
     },
     {
       "name": "credentials",
-      "description": "TODO",
+      "description": "Secure Credentials feature was designed to provide online merchants with the ability to store payment credentials for subsequent use in a secure and PCI-compliant manner on the Worldnet processing platform.\nIt eliminates the need for merchants to store customer cards and accounts locally on their own systems, avoiding the significant systems and financial overhead of managing their own PCI compliance and registration processes.\n\nBy using Secure Credentials from Worldnet a merchant can access the stored payment details through a ‘token’ number to generate payments on behalf of the cardholder for both ad-hoc and recurring payments.\n\n### How it works\n\nWhen registering payment credentials, clients may provide a reference value to identify the stored credentials on both merchant and Worldnet platforms.\nAlthough the `Merchant Reference` is optional and auto-generated by Worldnet when not provided, clients must still be able to store it on their side to perform CRUD operations on existing credentials. In fact, all information from secure credentials registration responses can be stored without any PCI security implications.\n\nTo perform transactions with stored credentials, clients must provide the unique token number generated by Worldnet similarly to regular card numbers.\n\nThe Secure Credentials feature was designed for merchants who want to:\n\n- Allow customers to make subsequent purchases without having to re-enter card details.\n- Retain cardholder details without the overhead of managing their own PCI compliance.\n- Provide subscription-based payments.\n- Facilitate recurring transactions.\n",
       "x-displayName": "Secure Credentials"
     },
     {
@@ -144,199 +144,6 @@
           {
             "Basic": []
           }
-        ],
-        "x-code-samples": [
-          {
-            "lang": "CURL",
-            "source": "curl https://devpayments.worldnettps.com/merchant/api/v1/account/authenticate \\\n  -H \"Authorization: Basic <Merchant API Key>\"\n"
-          }
-        ]
-      }
-    },
-    "/api/v1/account/terminals/{terminalNumber}": {
-      "get": {
-        "tags": [
-          "settings"
-        ],
-        "summary": "Load Terminal",
-        "description": "Loads the full details about the terminal's configuration. Supply the number of one of the terminals returned by the list operation.",
-        "operationId": "loadTerminalConfiguration",
-        "parameters": [
-          {
-            "name": "terminalNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Terminal"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "description": "Client Error",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "5XX": {
-            "description": "Server Error",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [
-              "account-api:full-access",
-              "account-api:ready-only"
-            ]
-          }
-        ]
-      },
-      "patch": {
-        "tags": [
-          "settings"
-        ],
-        "summary": "Update Terminal",
-        "description": "Partially updates the configuration of a terminal. Currently, the API only supports Tips and Taxes update.",
-        "operationId": "updateTerminalConfiguration",
-        "parameters": [
-          {
-            "name": "terminalNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTerminalRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Terminal"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "description": "Client Error",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "5XX": {
-            "description": "Server Error",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [
-              "account-api:full-access"
-            ]
-          }
         ]
       }
     },
@@ -428,7 +235,662 @@
               "account-api:ready-only"
             ]
           }
+        ],
+        "x-position": "0"
+      }
+    },
+    "/api/v1/customer/balances": {
+      "post": {
+        "tags": [
+          "balances"
+        ],
+        "summary": "EBT Balance Inquiry",
+        "description": "Performs a balance check on a given EBT Food Stamp / EBT Cash Benefits account.",
+        "operationId": "balanceInquiry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BalanceInquiryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Balance"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "customer-api:full-access"
+            ]
+          }
         ]
+      }
+    },
+    "/api/v1/customer/credentials": {
+      "post": {
+        "tags": [
+          "credentials"
+        ],
+        "summary": "Store Credentials",
+        "description": "Stores payment credentials of a customer for future use.",
+        "operationId": "storeCredentials",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreCredentialsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecureCredentials"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "customer-api:full-access"
+            ]
+          }
+        ],
+        "x-position": "0"
+      }
+    },
+    "/api/v1/account/terminals/{terminalNumber}": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Load Terminal",
+        "description": "Loads the full details about the terminal's configuration. Supply the number of one of the terminals returned by the list operation.",
+        "operationId": "loadTerminal",
+        "parameters": [
+          {
+            "name": "terminalNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Terminal"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "account-api:full-access",
+              "account-api:ready-only"
+            ]
+          }
+        ],
+        "x-position": "1"
+      },
+      "patch": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Update Terminal",
+        "description": "Partially updates the configuration of a terminal. Currently, it is only possible to update tips and taxes.",
+        "operationId": "updateTerminal",
+        "parameters": [
+          {
+            "name": "terminalNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTerminalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Terminal"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "account-api:full-access"
+            ]
+          }
+        ],
+        "x-position": "2"
+      }
+    },
+    "/api/v1/customer/credentials/{merchantReference}": {
+      "get": {
+        "tags": [
+          "credentials"
+        ],
+        "summary": "Get Credentials",
+        "description": "Retrieves the information about previouly stored secure credentials.",
+        "operationId": "getCredentials",
+        "parameters": [
+          {
+            "name": "terminal",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "merchantReference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecureCredentials"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "customer-api:full-access",
+              "customer-api:ready-only"
+            ]
+          }
+        ],
+        "x-position": "1"
+      },
+      "delete": {
+        "tags": [
+          "credentials"
+        ],
+        "summary": "Delete Credentials",
+        "description": "Performs a logical removal of existing secure credentials.\n\nIt is important to mention that `Merchant References` of deleted credentials cannot be resused.This is because they are tied to existing transactions in our system and are retained internally for data integrity and future refund functionality.",
+        "operationId": "deleteCredentials",
+        "parameters": [
+          {
+            "name": "terminal",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "merchantReference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "customer-api:full-access"
+            ]
+          }
+        ],
+        "x-position": "2"
+      },
+      "patch": {
+        "tags": [
+          "credentials"
+        ],
+        "summary": "Update Credentials",
+        "description": "Performs a partial update on the information of existing secure credentials.",
+        "operationId": "updateCredentials",
+        "parameters": [
+          {
+            "name": "merchantReference",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCredentialsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecureCredentials"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "customer-api:full-access"
+            ]
+          }
+        ],
+        "x-position": "3"
       }
     },
     "/api/v1/account/terminals/{terminalNumber}/endOfDay": {
@@ -438,7 +900,7 @@
         ],
         "summary": "End Of Day",
         "description": "For terminals in manual settle mode, this operation must be used to indicate the end-of-day closing so that clearing and settlement processes can take place.",
-        "operationId": "updateTerminalEndOfDayCutOffTime",
+        "operationId": "endOfDay",
         "parameters": [
           {
             "name": "terminalNumber",
@@ -517,105 +979,8 @@
               "account-api:full-access"
             ]
           }
-        ]
-      }
-    },
-    "/api/v1/account/terminals/{terminalNumber}/devices/{type}": {
-      "get": {
-        "tags": [
-          "settings"
         ],
-        "summary": "Load POS Device Type",
-        "description": "Loads the full details about the device's configuration. Supply the type of one of the devices returned by the list operation.",
-        "operationId": "getDeviceConfiguration",
-        "parameters": [
-          {
-            "name": "terminalNumber",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "type",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeviceType"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "description": "Client Error",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "5XX": {
-            "description": "Server Error",
-            "headers": {
-              "X-Request-Id": {
-                "description": "Unique identifier assigned by Worldnet for each request.",
-                "style": "simple",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [
-              "account-api:full-access",
-              "account-api:ready-only"
-            ]
-          }
-        ]
+        "x-position": "3"
       }
     },
     "/api/v1/account/terminals/{terminalNumber}/devices": {
@@ -624,8 +989,8 @@
           "settings"
         ],
         "summary": "List POS Device Types",
-        "description": "Returns a paginated list of basic information about the POS device types supported by the terminal. Use the `load` hypermedia link to retrieve the complete information about a POS device.",
-        "operationId": "list",
+        "description": "Returns a paginated list of basic information about the POS device types supported by the terminal. Use the `load` hypermedia link to retrieve the complete information about a POS device type.",
+        "operationId": "listDeviceTypes",
         "parameters": [
           {
             "name": "pageSize",
@@ -714,7 +1079,107 @@
               "account-api:ready-only"
             ]
           }
-        ]
+        ],
+        "x-position": "4"
+      }
+    },
+    "/api/v1/account/terminals/{terminalNumber}/devices/{type}": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Load POS Device Type",
+        "description": "Loads the full details about the device's configuration. Supply the type of one of the devices returned by the list operation.",
+        "operationId": "loadDeviceTypes",
+        "parameters": [
+          {
+            "name": "terminalNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceType"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "Client Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Server Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Unique identifier assigned by Worldnet for each request.",
+                "style": "simple",
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [
+              "account-api:full-access",
+              "account-api:ready-only"
+            ]
+          }
+        ],
+        "x-position": "5"
       }
     }
   },
@@ -762,7 +1227,7 @@
           },
           "enableHypermedia": {
             "type": "boolean",
-            "description": "Indicates whether or not the response should contains hypermedia links"
+            "description": "Indicates whether the response should contains hypermedia links"
           },
           "roles": {
             "uniqueItems": true,
@@ -795,7 +1260,7 @@
         "properties": {
           "debugIdentifier": {
             "type": "string",
-            "description": "Clients should use this field when communicating to our support team.It allows us to easily identify the request and consequently the reason behind its failure."
+            "description": "Clients should use this field when communicating to our support team. It allows us to easily identify the request and consequently the reason behind its failure."
           },
           "details": {
             "uniqueItems": true,
@@ -865,41 +1330,124 @@
           }
         }
       },
+      "HypermediaLink": {
+        "type": "object",
+        "properties": {
+          "rel": {
+            "type": "string",
+            "description": "Keyword that represents the action that the link is supposed to perform."
+          },
+          "method": {
+            "type": "string",
+            "description": "The HTTP method or verb.",
+            "example": "POST"
+          },
+          "href": {
+            "type": "string",
+            "description": "The actual request URL."
+          }
+        }
+      },
+      "TerminalCompact": {
+        "required": [
+          "paymentProcessor",
+          "terminalNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "terminalNumber": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique number assigned by Worldnet."
+          },
+          "paymentProcessor": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string",
+            "description": "The financial entity that will process and authorise the operations performed by the terminal."
+          },
+          "displayName": {
+            "maxLength": 24,
+            "minLength": 0,
+            "type": "string",
+            "description": "Friendly name assigned by the merchant."
+          },
+          "links": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HypermediaLink"
+            }
+          }
+        }
+      },
+      "TerminalPaginatedResult": {
+        "required": [
+          "data",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TerminalCompact"
+            }
+          },
+          "links": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HypermediaLink"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "Address": {
         "type": "object",
         "properties": {
           "line1": {
             "maxLength": 50,
             "minLength": 0,
-            "type": "string"
+            "type": "string",
+            "description": "The first line of the address.<br />This field is used for AVS checks along with `city` and `postalCode`."
           },
           "line2": {
             "maxLength": 50,
             "minLength": 0,
-            "type": "string"
+            "type": "string",
+            "description": "The second line of the address, if any."
           },
           "postalCode": {
             "maxLength": 50,
             "minLength": 0,
-            "type": "string"
+            "type": "string",
+            "description": "The address's postal code."
           },
           "city": {
             "maxLength": 128,
             "minLength": 0,
-            "type": "string"
+            "type": "string",
+            "description": "The city or town of the address."
           },
           "region": {
             "maxLength": 128,
             "minLength": 0,
-            "type": "string"
+            "type": "string",
+            "description": "The region within the address's city, if any."
           },
           "country": {
             "maxLength": 2,
             "minLength": 2,
-            "type": "string"
+            "type": "string",
+            "description": "The two-letter country code defined by [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) standard."
           }
-        },
-        "description": "Merchant's address."
+        }
       },
       "AvsCheck": {
         "required": [
@@ -908,16 +1456,20 @@
         "type": "object",
         "properties": {
           "enabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether AVS check is available for the terminal and merchants may send cardholder’s billing address for verification."
           },
           "compulsory": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, it ensures that a transaction will never be processed without billing address information."
           },
           "autoDeclineTransactionsOnAvsFailures": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates that all AVS non-match will lead to a transaction decline. This is sometimes desirable as not all card issuers will decline a transaction that has failed an AVS check."
           },
           "preferredAddressMode": {
             "type": "string",
+            "description": "This field defines a configuration for the execution and validation of AVS transactions.\n- Exact: At least the first line of the address as well as city and postal code are mandatory.\n- Postal: Only postal code is mandatory when filling up customer's billing address.",
             "enum": [
               "EXACT",
               "POSTAL"
@@ -925,8 +1477,10 @@
           },
           "avsApprovalCodes": {
             "type": "array",
+            "description": "List of AVS result codes that are considered to be a match. The codes left out of this list will lead to a transaction decline when `autoDeclineTransactionsOnAvsFailures` is enabled.",
             "items": {
               "type": "string",
+              "description": "List of AVS result codes that are considered to be a match. The codes left out of this list will lead to a transaction decline when `autoDeclineTransactionsOnAvsFailures` is enabled.",
               "enum": [
                 "Y",
                 "A",
@@ -952,10 +1506,12 @@
         "type": "object",
         "properties": {
           "card": {
-            "type": "string"
+            "type": "string",
+            "description": "The card brand to which the list of volume limits below will be applied."
           },
           "limits": {
             "type": "array",
+            "description": "List of limits to be applied to transactions using the brand specified in the property `card`.",
             "items": {
               "$ref": "#/components/schemas/CardVolumeLimit"
             }
@@ -980,18 +1536,23 @@
           },
           "limitThreshold": {
             "type": "integer",
+            "description": "The maximum amount allowed within the period described in the `limitScope` attribute.",
             "format": "int32"
           },
           "withoutCvvOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the limit will only take transactions without CVV into account. This is specially useful for merchants who are looking for a way to add thresholds for transactions that may lead to chargebacks.<br />This filter only applies to limits within `SINGLE_TRANSACTION` scope."
           },
           "withoutAvsOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the limit will only take transactions without AVS into account. This is specially useful for merchants who are looking for a way to add thresholds for transactions that may lead to chargebacks.<br />This filter only applies to limits within `SINGLE_TRANSACTION` scope."
           },
           "currentValue": {
-            "type": "number"
+            "type": "number",
+            "description": "The sum of all transactions performed with the `card` within the period described in the `limitScope` attribute.<br />At the end of each period, this value is reset."
           }
-        }
+        },
+        "description": "List of limits to be applied to transactions using the brand specified in the property `card`."
       },
       "CvvCheck": {
         "required": [
@@ -1000,15 +1561,19 @@
         "type": "object",
         "properties": {
           "enabled": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether CVV check is available for the terminal."
           },
           "autoDeclineTransactionsOnCvvFailures": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates that all CVV codes listed in `cvvDeclineCodes` property will lead to a transaction decline.This is sometimes desirable as not all card issuers will decline a transaction that has failed a CVV check."
           },
           "cvvDeclineCodes": {
             "type": "array",
+            "description": "List of CVV result codes that will lead to a transaction decline when `autoDeclineTransactionsOnCvvFailures` is enabled.",
             "items": {
               "type": "string",
+              "description": "List of CVV result codes that will lead to a transaction decline when `autoDeclineTransactionsOnCvvFailures` is enabled.",
               "enum": [
                 "M",
                 "N",
@@ -1016,24 +1581,6 @@
                 "U"
               ]
             }
-          }
-        }
-      },
-      "HypermediaLink": {
-        "type": "object",
-        "properties": {
-          "rel": {
-            "type": "string",
-            "description": "Keyword that represents the action that the link is supposed to perform."
-          },
-          "method": {
-            "type": "string",
-            "description": "The HTTP method or verb.",
-            "example": "POST"
-          },
-          "href": {
-            "type": "string",
-            "description": "The actual request URL."
           }
         }
       },
@@ -1050,32 +1597,32 @@
             "maxLength": 100,
             "minLength": 0,
             "type": "string",
-            "description": "Merchant's DBA (Doing Business As)."
+            "description": "Merchant's DBA (Doing Business As). This information will appear on transaction receipts."
           },
           "mcc": {
             "maxLength": 4,
             "minLength": 4,
             "pattern": "^[0-9]*$",
             "type": "string",
-            "description": "Merchant Category Code."
+            "description": "Merchant Category Code. It is a four-digit number listed in ISO 18245 for retail financial services. An MCC is used to classify a business by the types of goods or services it provides."
           },
           "phone": {
             "maxLength": 100,
             "minLength": 0,
             "type": "string",
-            "description": "Merchant's phone number."
+            "description": "Merchant's phone number. This information will appear on transaction receipts."
           },
           "email": {
             "maxLength": 100,
             "minLength": 0,
             "type": "string",
-            "description": "Merchant's email address."
+            "description": "Merchant's email address. This information will appear on transaction receipts."
           },
           "website": {
             "maxLength": 100,
             "minLength": 0,
             "type": "string",
-            "description": "Merchant's web page."
+            "description": "Merchant's web page. This information will appear on transaction receipts."
           },
           "address": {
             "$ref": "#/components/schemas/Address"
@@ -1107,13 +1654,16 @@
           },
           "limitThreshold": {
             "type": "integer",
+            "description": "The maximum amount allowed within the period described in the `limitScope` attribute.",
             "format": "int32"
           },
           "withoutCvvOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the limit will only take transactions without CVV into account. This is specially useful for merchants who are looking for a way to add thresholds for transactions that may lead to chargebacks.<br />This filter only applies to limits within `SINGLE_TRANSACTION` scope."
           },
           "withoutAvsOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the limit will only take transactions without AVS into account. This is specially useful for merchants who are looking for a way to add thresholds for transactions that may lead to chargebacks.<br />This filter only applies to limits within `SINGLE_TRANSACTION` scope."
           }
         },
         "description": "List of merchant-level volume limits."
@@ -1133,7 +1683,8 @@
             "$ref": "#/components/schemas/AvsCheck"
           },
           "allowCardholderSignatureBypass": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether cardholder signature requirement should be relaxed."
           }
         },
         "description": "Terminal security and fraud detection configuration."
@@ -1191,25 +1742,25 @@
           },
           "terminalCustomFields": {
             "type": "array",
-            "description": "List of additional data fields that can be used when performing transactions or storing secure credentials.",
+            "description": "List of additional data fields that can be used when performing transactions or storing secure credentials.<br />For more information about custom fields, see [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_custom_fields).",
             "items": {
               "$ref": "#/components/schemas/TerminalCustomField"
             }
           },
           "supportedCards": {
             "type": "array",
-            "description": "The list of card brands supported by the terminal.",
+            "description": "List of card brands supported by the terminal.",
             "items": {
               "type": "string",
-              "description": "The list of card brands supported by the terminal."
+              "description": "List of card brands supported by the terminal."
             }
           },
           "supportedCurrencies": {
             "type": "array",
-            "description": "The list of currencies supported by the terminal.",
+            "description": "List of currencies supported by the terminal to multi-currency processing of any kind.",
             "items": {
               "type": "string",
-              "description": "The list of currencies supported by the terminal.",
+              "description": "List of currencies supported by the terminal to multi-currency processing of any kind.",
               "enum": [
                 "AED",
                 "AFN",
@@ -1387,10 +1938,10 @@
           },
           "supportedDeviceTypes": {
             "type": "array",
-            "description": "The list of POS devices supported by the terminal.",
+            "description": "List of POS device types supported by the terminal.",
             "items": {
               "type": "string",
-              "description": "The list of POS devices supported by the terminal."
+              "description": "List of POS device types supported by the terminal."
             }
           },
           "cardVolumeLimits": {
@@ -1423,39 +1974,52 @@
           "mandatory",
           "name",
           "paymentPage",
-          "secureCardOnly",
+          "secureCredentialsOnly",
           "subscription",
           "type"
         ],
         "type": "object",
         "properties": {
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "The type of the data the custom field is configured to carry.",
+            "enum": [
+              "STRING",
+              "NUMERIC",
+              "BOOLEAN"
+            ]
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Custom field name assigned by the merchant."
           },
           "displayName": {
-            "type": "string"
+            "type": "string",
+            "description": "Friendly name that should be used for receipts and pages."
           },
           "displayOrder": {
             "type": "integer",
+            "description": "Position of the field in relation to other custom fields.",
             "format": "int32"
           },
           "paymentPage": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the custom field should be shown on Worldnet hosted pages."
           },
           "subscription": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the custom field should be considered for Subscriptions which is Worldnet payment plan / standing order mechanism."
+          },
+          "secureCredentialsOnly": {
+            "type": "boolean",
+            "description": "Indicates whether the custom field will **only** serve the purpose of adding additional information to secure cards or accounts."
           },
           "mandatory": {
-            "type": "boolean"
-          },
-          "secureCardOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, it ensures that a transaction will never be processed without the custom field properly populated."
           }
         },
-        "description": "List of additional data fields that can be used when performing transactions or storing secure credentials."
+        "description": "List of additional data fields that can be used when performing transactions or storing secure credentials.<br />For more information about custom fields, see [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_custom_fields)."
       },
       "TerminalLevelLimit": {
         "required": [
@@ -1474,16 +2038,20 @@
           },
           "limitThreshold": {
             "type": "integer",
+            "description": "The maximum amount allowed within the period described in the `limitScope` attribute.",
             "format": "int32"
           },
           "withoutCvvOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the limit will only take transactions without CVV into account. This is specially useful for merchants who are looking for a way to add thresholds for transactions that may lead to chargebacks.<br />This filter only applies to limits within `SINGLE_TRANSACTION` scope."
           },
           "withoutAvsOnly": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the limit will only take transactions without AVS into account. This is specially useful for merchants who are looking for a way to add thresholds for transactions that may lead to chargebacks.<br />This filter only applies to limits within `SINGLE_TRANSACTION` scope."
           },
           "currentValue": {
-            "type": "number"
+            "type": "number",
+            "description": "The sum of all transactions performed by the terminal within the period described in the `limitScope` attribute.<br />At the end of each period, this value is reset."
           }
         },
         "description": "List of terminal-level volume limits."
@@ -1502,7 +2070,7 @@
           "allowPos",
           "allowPreAuthorization",
           "allowRecurring",
-          "allowTokenPayload",
+          "allowSecureCredentials",
           "allowUnreferencedRefund",
           "allowWeb",
           "automaticSettle",
@@ -1511,61 +2079,80 @@
         "type": "object",
         "properties": {
           "allowWeb": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is configured to process Internet-based transactions."
           },
           "allowPos": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is configured to process POS-based (Cardholder Present) transactions."
           },
           "allowMoto": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is configured to process Mail Order / Telephone Order transactions."
           },
           "allowEmcp": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal supports eCommerce Multi-Currency Processing."
           },
           "allowEdcc": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal supports eCommerce Dynamic Currency Conversion."
           },
           "allowMulticurrency": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal supports multi-currency processing."
           },
           "allowRecurring": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal allows recurring payments."
           },
           "allowPreAuthorization": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal allows pre-authorizations.<br />This type of transactions need to be complemented with a capture operation which can be done for a partial as well as a full amount."
           },
           "allowPartialRefund": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal allows partial refunds."
           },
           "allowUnreferencedRefund": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal allows unreferenced refunds.<br />This type of refunds do not require a prior payment transaction to be referenced."
           },
           "allowDigitalWalletPayload": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is able to handle card payloads from digital wallet applications.<br />Worldnet supports Apple Pay and Google Pay digital wallets."
           },
           "allowEmvPayload": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is able to handle card payloads from EMV devices."
           },
           "allowKeyedPayload": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is able to handle manually keyed card details."
           },
           "allowMagStripePayload": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal is able to handle card payloads from MSR devices."
           },
-          "allowTokenPayload": {
-            "type": "boolean"
+          "allowSecureCredentials": {
+            "type": "boolean",
+            "description": "Indicates whether the terminal supports secure credentials which is the Worldnet's tokenization mechanism for cards and accounts."
           },
           "forceUniqueOrderId": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether the terminal accepts duplicate order identifiers.<br />An order is considered a duplicate when there is already another approved transaction sitting in the open batch with the same identifier."
           },
           "automaticSettle": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "If enabled, the terminal's transactions will be automatically cleared and settled based on the cut-off time in `batchTime` property."
           },
           "batchTime": {
-            "type": "string"
+            "type": "string",
+            "description": "Time that defines the end-of-day closing for the terminal.<br />When in manual mode, merchants must send a `endOfDay` request in order to indicate that transactions performed prior to that moment are eligible to be cleared in the next settlement run."
           },
           "timeZone": {
-            "type": "string"
+            "type": "string",
+            "description": "Terminal's preferred time-zone."
           }
         },
         "description": "Terminal settings and capabilities."
@@ -1580,10 +2167,12 @@
           "uniqueReference": {
             "maxLength": 10,
             "minLength": 10,
-            "type": "string"
+            "type": "string",
+            "description": "Unique reference number assigned by Worldnet. This field must be used when trying to update an existing terminal's tax."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Tax Name."
           },
           "rate": {
             "maximum": 100,
@@ -1591,6 +2180,7 @@
             "minimum": 0,
             "exclusiveMinimum": false,
             "type": "number",
+            "description": "The ratio expressed as a percentage at which a transaction is taxed.",
             "format": "double"
           }
         },
@@ -1605,7 +2195,8 @@
           "uniqueReference": {
             "maxLength": 10,
             "minLength": 10,
-            "type": "string"
+            "type": "string",
+            "description": "Unique reference number assigned by Worldnet. This field must be used when trying to update an existing terminal's tip."
           },
           "type": {
             "type": "string",
@@ -1616,6 +2207,7 @@
           },
           "currency": {
             "type": "string",
+            "description": "Currency associated with the tip. This is specially useful for multi-currency terminals in order to provide a different set of tips for each supported currency.",
             "enum": [
               "AED",
               "AFN",
@@ -1793,7 +2385,8 @@
           "amount": {
             "minimum": 0,
             "exclusiveMinimum": true,
-            "type": "number"
+            "type": "number",
+            "description": "This field must used when the tip is of type `FIXED_AMOUNT`. Otherwise, refer to the `percentage` property instead."
           },
           "percentage": {
             "maximum": 100,
@@ -1801,6 +2394,7 @@
             "minimum": 0,
             "exclusiveMinimum": true,
             "type": "number",
+            "description": "This field must used when the tip is of type `PERCENTAGE`. Otherwise, refer to the `amount` property instead.",
             "format": "double"
           }
         },
@@ -1825,41 +2419,7 @@
           }
         }
       },
-      "TerminalCompact": {
-        "required": [
-          "paymentProcessor",
-          "terminalNumber"
-        ],
-        "type": "object",
-        "properties": {
-          "terminalNumber": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string",
-            "description": "Unique number assigned by Worldnet."
-          },
-          "paymentProcessor": {
-            "maxLength": 128,
-            "minLength": 1,
-            "type": "string",
-            "description": "The financial entity that will process and authorise the operations performed by the terminal."
-          },
-          "displayName": {
-            "maxLength": 24,
-            "minLength": 0,
-            "type": "string",
-            "description": "Friendly name assigned by the merchant."
-          },
-          "links": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HypermediaLink"
-            }
-          }
-        }
-      },
-      "TerminalPaginatedResult": {
+      "DevicePaginatedResult": {
         "required": [
           "data",
           "totalCount"
@@ -1869,7 +2429,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TerminalCompact"
+              "$ref": "#/components/schemas/DeviceTypeCompact"
             }
           },
           "links": {
@@ -1885,6 +2445,33 @@
           }
         }
       },
+      "DeviceTypeCompact": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "maxLength": 30,
+            "minLength": 1,
+            "type": "string",
+            "description": "Type of device."
+          },
+          "manufacturer": {
+            "maxLength": 24,
+            "minLength": 0,
+            "type": "string",
+            "description": "Company responsible for manufacturing the devices of this type."
+          },
+          "links": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HypermediaLink"
+            }
+          }
+        }
+      },
       "DeviceType": {
         "required": [
           "type"
@@ -1894,33 +2481,42 @@
           "type": {
             "maxLength": 30,
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "description": "Type of device."
           },
           "manufacturer": {
             "maxLength": 24,
             "minLength": 0,
-            "type": "string"
+            "type": "string",
+            "description": "Company responsible for manufacturing the devices of this type."
           },
           "supportsMagStripe": {
-            "type": "boolean"
-          },
-          "supportsKeyed": {
-            "type": "boolean"
-          },
-          "supportsContactless": {
-            "type": "boolean"
-          },
-          "supportsPinEntry": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of performing card swipes."
           },
           "supportsIcc": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of reading card chips."
+          },
+          "supportsKeyed": {
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of accepting keyed inputs."
+          },
+          "supportsContactless": {
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of performing contactless transactions."
+          },
+          "supportsPinEntry": {
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of accepting PIN entry."
           },
           "supportsOutputPrinting": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of printing."
           },
           "supportsOutputDisplaying": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Indicates whether this type of device is capable of displaying information."
           },
           "applications": {
             "type": "array",
@@ -1991,68 +2587,1437 @@
         ],
         "type": "object",
         "properties": {
+          "hex": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
           "decimal": {
             "type": "integer",
             "format": "int32"
           },
           "description": {
             "type": "string"
-          },
-          "hex": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
           }
-        }
+        },
+        "description": "The list of EMV tags. Not required unless the `tlv` field is absent."
       },
-      "DevicePaginatedResult": {
+      "AccountBalance": {
         "required": [
-          "data",
-          "totalCount"
+          "amount",
+          "benefitCategory",
+          "currency"
         ],
         "type": "object",
         "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DeviceTypeCompact"
-            }
+          "benefitCategory": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "FOOD_STAMP"
+            ]
           },
-          "links": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/HypermediaLink"
-            }
+          "currency": {
+            "type": "string",
+            "description": "The 3-Letter Currency Code.",
+            "enum": [
+              "AED",
+              "AFN",
+              "ALL",
+              "AMD",
+              "ANG",
+              "AOA",
+              "ARS",
+              "AUD",
+              "AWG",
+              "AZN",
+              "BAM",
+              "BBD",
+              "BDT",
+              "BGN",
+              "BHD",
+              "BIF",
+              "BMD",
+              "BND",
+              "BOB",
+              "BOV",
+              "BRL",
+              "BSD",
+              "BTN",
+              "BWP",
+              "BYR",
+              "BZD",
+              "CAD",
+              "CDF",
+              "CHE",
+              "CHF",
+              "CHW",
+              "CLF",
+              "CLP",
+              "CNY",
+              "COP",
+              "COU",
+              "CRC",
+              "CUC",
+              "CUP",
+              "CVE",
+              "CZK",
+              "DJF",
+              "DKK",
+              "DOP",
+              "DZD",
+              "EGP",
+              "ERN",
+              "ETB",
+              "EUR",
+              "FJD",
+              "FKP",
+              "GBP",
+              "GEL",
+              "GHS",
+              "GIP",
+              "GMD",
+              "GNF",
+              "GTQ",
+              "GYD",
+              "HKD",
+              "HNL",
+              "HRK",
+              "HTG",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "IRR",
+              "ISK",
+              "JMD",
+              "JOD",
+              "JPY",
+              "KES",
+              "KGS",
+              "KHR",
+              "KMF",
+              "KPW",
+              "KRW",
+              "KWD",
+              "KYD",
+              "KZT",
+              "LAK",
+              "LBP",
+              "LKR",
+              "LRD",
+              "LSL",
+              "LTL",
+              "LVL",
+              "LYD",
+              "MAD",
+              "MDL",
+              "MGA",
+              "MKD",
+              "MMK",
+              "MNT",
+              "MOP",
+              "MRO",
+              "MRU",
+              "MUR",
+              "MVR",
+              "MWK",
+              "MXN",
+              "MXV",
+              "MYR",
+              "MZN",
+              "NAD",
+              "NGN",
+              "NIO",
+              "NOK",
+              "NPR",
+              "NZD",
+              "OMR",
+              "PAB",
+              "PEN",
+              "PGK",
+              "PHP",
+              "PKR",
+              "PLN",
+              "PYG",
+              "QAR",
+              "RON",
+              "RSD",
+              "RUB",
+              "RWF",
+              "SAR",
+              "SBD",
+              "SCR",
+              "SDG",
+              "SEK",
+              "SGD",
+              "SHP",
+              "SLL",
+              "SOS",
+              "SRD",
+              "SSP",
+              "STD",
+              "STN",
+              "SVC",
+              "SYP",
+              "SZL",
+              "THB",
+              "TJS",
+              "TMT",
+              "TND",
+              "TOP",
+              "TRY",
+              "TTD",
+              "TWD",
+              "TZS",
+              "UAH",
+              "UGX",
+              "USD",
+              "USN",
+              "USS",
+              "UYI",
+              "UYU",
+              "UZS",
+              "VEF",
+              "VES",
+              "VND",
+              "VUV",
+              "WST",
+              "XAF",
+              "XCD",
+              "XOF",
+              "XPF",
+              "YER",
+              "ZAR",
+              "ZMW",
+              "ZWL"
+            ]
           },
-          "totalCount": {
-            "type": "integer",
-            "format": "int64"
+          "amount": {
+            "type": "number",
+            "description": "Current balance amount."
+          }
+        },
+        "description": "List of balance results per benefit category."
+      },
+      "Balance": {
+        "required": [
+          "terminal"
+        ],
+        "type": "object",
+        "properties": {
+          "terminal": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string",
+            "description": "The terminal number assigned by Worldnet. This field indicates the terminal responsible for processing the transaction."
+          },
+          "operator": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The operator who initiated the transaction. If not sent in the request, Worldnet automatically fills this field with the API Key alias."
+          },
+          "dateTime": {
+            "type": "string",
+            "description": "Merchant date/time. If not sent in the request, Worldnet automatically fills this field with the current date/time.\n\n**Note:** The format expected for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) specification.",
+            "format": "date-time"
+          },
+          "transactionResult": {
+            "$ref": "#/components/schemas/TransactionResult"
+          },
+          "accountBalances": {
+            "type": "array",
+            "description": "List of balance results per benefit category.",
+            "items": {
+              "$ref": "#/components/schemas/AccountBalance"
+            }
           }
         }
       },
-      "DeviceTypeCompact": {
+      "TransactionResult": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the generated transaction.",
+            "enum": [
+              "SALE",
+              "PREAUTH",
+              "COMPLETION",
+              "REFUND",
+              "OFFLINE_DECLINE",
+              "WITHDRAWAL"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the generated transaction.",
+            "enum": [
+              "READY",
+              "PENDING",
+              "VOID",
+              "DECLINED",
+              "COMPLETE",
+              "REFERRAL",
+              "PICKUP",
+              "REVERSAL",
+              "SENT",
+              "ADMIN",
+              "EXPIRED",
+              "ACCEPTED",
+              "REVIEW",
+              "OTHER"
+            ]
+          },
+          "approvalCode": {
+            "maxLength": 48,
+            "minLength": 0,
+            "type": "string",
+            "description": "The authorisation code assigned by the payment processor for approved transactions."
+          },
+          "currency": {
+            "type": "string",
+            "description": "The 3-Letter Currency Code.",
+            "enum": [
+              "AED",
+              "AFN",
+              "ALL",
+              "AMD",
+              "ANG",
+              "AOA",
+              "ARS",
+              "AUD",
+              "AWG",
+              "AZN",
+              "BAM",
+              "BBD",
+              "BDT",
+              "BGN",
+              "BHD",
+              "BIF",
+              "BMD",
+              "BND",
+              "BOB",
+              "BOV",
+              "BRL",
+              "BSD",
+              "BTN",
+              "BWP",
+              "BYR",
+              "BZD",
+              "CAD",
+              "CDF",
+              "CHE",
+              "CHF",
+              "CHW",
+              "CLF",
+              "CLP",
+              "CNY",
+              "COP",
+              "COU",
+              "CRC",
+              "CUC",
+              "CUP",
+              "CVE",
+              "CZK",
+              "DJF",
+              "DKK",
+              "DOP",
+              "DZD",
+              "EGP",
+              "ERN",
+              "ETB",
+              "EUR",
+              "FJD",
+              "FKP",
+              "GBP",
+              "GEL",
+              "GHS",
+              "GIP",
+              "GMD",
+              "GNF",
+              "GTQ",
+              "GYD",
+              "HKD",
+              "HNL",
+              "HRK",
+              "HTG",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "IRR",
+              "ISK",
+              "JMD",
+              "JOD",
+              "JPY",
+              "KES",
+              "KGS",
+              "KHR",
+              "KMF",
+              "KPW",
+              "KRW",
+              "KWD",
+              "KYD",
+              "KZT",
+              "LAK",
+              "LBP",
+              "LKR",
+              "LRD",
+              "LSL",
+              "LTL",
+              "LVL",
+              "LYD",
+              "MAD",
+              "MDL",
+              "MGA",
+              "MKD",
+              "MMK",
+              "MNT",
+              "MOP",
+              "MRO",
+              "MRU",
+              "MUR",
+              "MVR",
+              "MWK",
+              "MXN",
+              "MXV",
+              "MYR",
+              "MZN",
+              "NAD",
+              "NGN",
+              "NIO",
+              "NOK",
+              "NPR",
+              "NZD",
+              "OMR",
+              "PAB",
+              "PEN",
+              "PGK",
+              "PHP",
+              "PKR",
+              "PLN",
+              "PYG",
+              "QAR",
+              "RON",
+              "RSD",
+              "RUB",
+              "RWF",
+              "SAR",
+              "SBD",
+              "SCR",
+              "SDG",
+              "SEK",
+              "SGD",
+              "SHP",
+              "SLL",
+              "SOS",
+              "SRD",
+              "SSP",
+              "STD",
+              "STN",
+              "SVC",
+              "SYP",
+              "SZL",
+              "THB",
+              "TJS",
+              "TMT",
+              "TND",
+              "TOP",
+              "TRY",
+              "TTD",
+              "TWD",
+              "TZS",
+              "UAH",
+              "UGX",
+              "USD",
+              "USN",
+              "USS",
+              "UYI",
+              "UYU",
+              "UZS",
+              "VEF",
+              "VES",
+              "VND",
+              "VUV",
+              "WST",
+              "XAF",
+              "XCD",
+              "XOF",
+              "XPF",
+              "YER",
+              "ZAR",
+              "ZMW",
+              "ZWL"
+            ]
+          },
+          "authorisedAmount": {
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "type": "number",
+            "description": "The amount authorised by the payment processor.<br />For partial authorisations, this amount will be lower than the actual amount sent in the request."
+          },
+          "resultCode": {
+            "type": "string",
+            "description": "Worldnet maps result codes sent by different payment processors into a smaller set of codes as shown below. The original result code may be available in the `processorResultCode` field.\n\n- **A**: Approved / Authorised.\n- **D**: Declined / Not Authorised.\n- **E**: Accepted for later processing, but result currently unknown.\n- **P**: Only a portion of the original amount requested was authorised.\n- **R**: Issuer has declined the transaction and indicated that the customer should contact their bank.\n- **C**: Issuer has declined the transaction and requested that the card be retained as it may have been reported as lost or stolen.",
+            "enum": [
+              "A",
+              "D",
+              "E",
+              "P",
+              "R",
+              "C"
+            ]
+          },
+          "resultMessage": {
+            "type": "string",
+            "description": "A brief description send by the processor about the transaction result.<br />Clients must use this description in order to understand the cause of rejections and declines."
+          },
+          "processorResultCode": {
+            "type": "string",
+            "description": "The original result code sent by the payment processor."
+          },
+          "credentialsMerchantReference": {
+            "type": "string",
+            "description": "Reference to the credentials which were automatically stored based on the payment details.<br />Client applications must store this reference to be able to [retrieve](#operation/getCredentials), [update](#operation/updateCredentials) or [delete](#operation/deleteCredentials) the credentials in the future.\n\n**Note:** Automatic tokenisation feature is optional and it is not available for all accounts. Therefore, merchants who are interested in having this feature must get in touch with Worldnet to check its availability."
+          }
+        },
+        "description": "The result details of the transaction between Worldnet and the payment provider.<br />The important fields for balance responses that clients must be able to handle are `resultCode` and `resultMessage`\n\nFor the full list of response codes, see [Transaction Responses](https://docs.worldnettps.com/doku.php?id=merchant:existing_merchant:other_information:transaction_responses)."
+      },
+      "BalanceInquiryRequest": {
         "required": [
-          "type"
+          "currency",
+          "customerAccount",
+          "terminal"
+        ],
+        "type": "object",
+        "properties": {
+          "terminal": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string",
+            "description": "The terminal number assigned by Worldnet. This field indicates the terminal responsible for processing the transaction."
+          },
+          "operator": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The operator who initiated the transaction. If not sent in the request, Worldnet automatically fills this field with the API Key alias."
+          },
+          "dateTime": {
+            "type": "string",
+            "description": "Merchant date/time. If not sent in the request, Worldnet automatically fills this field with the current date/time.\n\n**Note:** The format expected for date/time attributes in the API is described by the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) specification.",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string",
+            "description": "The 3-Letter Currency Code.",
+            "enum": [
+              "AED",
+              "AFN",
+              "ALL",
+              "AMD",
+              "ANG",
+              "AOA",
+              "ARS",
+              "AUD",
+              "AWG",
+              "AZN",
+              "BAM",
+              "BBD",
+              "BDT",
+              "BGN",
+              "BHD",
+              "BIF",
+              "BMD",
+              "BND",
+              "BOB",
+              "BOV",
+              "BRL",
+              "BSD",
+              "BTN",
+              "BWP",
+              "BYR",
+              "BZD",
+              "CAD",
+              "CDF",
+              "CHE",
+              "CHF",
+              "CHW",
+              "CLF",
+              "CLP",
+              "CNY",
+              "COP",
+              "COU",
+              "CRC",
+              "CUC",
+              "CUP",
+              "CVE",
+              "CZK",
+              "DJF",
+              "DKK",
+              "DOP",
+              "DZD",
+              "EGP",
+              "ERN",
+              "ETB",
+              "EUR",
+              "FJD",
+              "FKP",
+              "GBP",
+              "GEL",
+              "GHS",
+              "GIP",
+              "GMD",
+              "GNF",
+              "GTQ",
+              "GYD",
+              "HKD",
+              "HNL",
+              "HRK",
+              "HTG",
+              "HUF",
+              "IDR",
+              "ILS",
+              "INR",
+              "IQD",
+              "IRR",
+              "ISK",
+              "JMD",
+              "JOD",
+              "JPY",
+              "KES",
+              "KGS",
+              "KHR",
+              "KMF",
+              "KPW",
+              "KRW",
+              "KWD",
+              "KYD",
+              "KZT",
+              "LAK",
+              "LBP",
+              "LKR",
+              "LRD",
+              "LSL",
+              "LTL",
+              "LVL",
+              "LYD",
+              "MAD",
+              "MDL",
+              "MGA",
+              "MKD",
+              "MMK",
+              "MNT",
+              "MOP",
+              "MRO",
+              "MRU",
+              "MUR",
+              "MVR",
+              "MWK",
+              "MXN",
+              "MXV",
+              "MYR",
+              "MZN",
+              "NAD",
+              "NGN",
+              "NIO",
+              "NOK",
+              "NPR",
+              "NZD",
+              "OMR",
+              "PAB",
+              "PEN",
+              "PGK",
+              "PHP",
+              "PKR",
+              "PLN",
+              "PYG",
+              "QAR",
+              "RON",
+              "RSD",
+              "RUB",
+              "RWF",
+              "SAR",
+              "SBD",
+              "SCR",
+              "SDG",
+              "SEK",
+              "SGD",
+              "SHP",
+              "SLL",
+              "SOS",
+              "SRD",
+              "SSP",
+              "STD",
+              "STN",
+              "SVC",
+              "SYP",
+              "SZL",
+              "THB",
+              "TJS",
+              "TMT",
+              "TND",
+              "TOP",
+              "TRY",
+              "TTD",
+              "TWD",
+              "TZS",
+              "UAH",
+              "UGX",
+              "USD",
+              "USN",
+              "USS",
+              "UYI",
+              "UYU",
+              "UZS",
+              "VEF",
+              "VES",
+              "VND",
+              "VUV",
+              "WST",
+              "XAF",
+              "XCD",
+              "XOF",
+              "XPF",
+              "YER",
+              "ZAR",
+              "ZMW",
+              "ZWL"
+            ]
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "customerAccount": {
+            "$ref": "#/components/schemas/Payload"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "maxLength": 60,
+            "minLength": 0,
+            "type": "string",
+            "description": "The customer's first name."
+          },
+          "lastName": {
+            "maxLength": 60,
+            "minLength": 0,
+            "type": "string",
+            "description": "The customer's last name."
+          },
+          "fullName": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string",
+            "description": "The customer's full name."
+          },
+          "gender": {
+            "type": "string",
+            "description": "The customer's gender.",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "TRANSGENDER",
+              "NON_BINARY",
+              "NOT_STATED"
+            ]
+          },
+          "birthYear": {
+            "type": "integer",
+            "description": "The customer's birth year.",
+            "format": "int32"
+          },
+          "phone": {
+            "type": "string",
+            "description": "The customer's contact phone number.<br />If **SMS Cardholder Receipts** feature is enabled in the terminal, Worldnet will use this number to automatically send the receipts of eventual transactions."
+          },
+          "notificationEmail": {
+            "type": "string",
+            "description": "The customer's contact email address.<br />If **Email Cardholder Receipt** feature is enabled in the terminal, Worldnet will use this address to automatically send the receipts of eventual transactions."
+          },
+          "notificationLanguage": {
+            "maxLength": 2,
+            "minLength": 2,
+            "type": "string",
+            "description": "The customer's preferred notification language.<br />The two-letter language code defined by the [ISO 639-1 alpha-2](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) standard.",
+            "enum": [
+              "en",
+              "fr"
+            ]
+          },
+          "billingAddress": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "shippingAddress": {
+            "$ref": "#/components/schemas/Address"
+          }
+        },
+        "description": "Customer details."
+      },
+      "Device": {
+        "required": [
+          "dataKsn"
         ],
         "type": "object",
         "properties": {
           "type": {
             "maxLength": 30,
-            "minLength": 1,
-            "type": "string"
-          },
-          "manufacturer": {
-            "maxLength": 24,
             "minLength": 0,
             "type": "string"
+          },
+          "dataKsn": {
+            "type": "string"
+          },
+          "serialNumber": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "ATTENDED",
+              "UNATTENDED"
+            ]
+          }
+        },
+        "description": "Information about the POS device used to capture the card details."
+      },
+      "DigitalWalletPayload": {
+        "required": [
+          "encryptedData",
+          "payloadType",
+          "serviceProvider"
+        ],
+        "type": "object",
+        "properties": {
+          "payloadType": {
+            "type": "string"
+          },
+          "serviceProvider": {
+            "type": "string",
+            "description": "The wallet application provider.",
+            "enum": [
+              "GOOGLE",
+              "APPLE"
+            ]
+          },
+          "cardholderName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The cardholder's name as it appears on the card."
+          },
+          "encryptedData": {
+            "maxLength": 20480,
+            "minLength": 128,
+            "type": "string",
+            "description": "The encrypted data generated by the digital wallet application."
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "default": "CHECKING"
+          }
+        }
+      },
+      "DukptPinDetails": {
+        "required": [
+          "pin",
+          "pinKsn"
+        ],
+        "type": "object",
+        "properties": {
+          "pin": {
+            "type": "string",
+            "description": "The PIN encrypted using [DUKPT](https://en.wikipedia.org/wiki/Derived_unique_key_per_transaction) Scheme."
+          },
+          "pinKsn": {
+            "maxLength": 20,
+            "minLength": 20,
+            "type": "string",
+            "description": "The key serial number."
+          }
+        },
+        "description": "PIN details."
+      },
+      "EbtDetails": {
+        "required": [
+          "benefitCategory"
+        ],
+        "type": "object",
+        "properties": {
+          "benefitCategory": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "FOOD_STAMP"
+            ]
+          },
+          "withdrawal": {
+            "type": "boolean",
+            "description": "Indicates a cash withdrawal request. This option is only available for EBT cash benefits accounts."
+          }
+        },
+        "description": "EBT details, only required for electronic-benefit-transfer transactions."
+      },
+      "EmvPayload": {
+        "required": [
+          "device",
+          "payloadType"
+        ],
+        "type": "object",
+        "properties": {
+          "payloadType": {
+            "type": "string"
+          },
+          "downgradeTo": {
+            "type": "string",
+            "description": "This field gives clients the ability to reprocess offline transactions that were not approved initially in a different entry mode.<br />For instance, `EMV` transactions are allowed to be downgraded to `MAG_STRIPE` or `KEYED`.",
+            "enum": [
+              "MAG_STRIPE",
+              "KEYED"
+            ]
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "tlv": {
+            "type": "string",
+            "description": "The EMV tags in TLV (Tag-Length-Value) format.<br />For clients not familiar with this format, the API also offer the possibility of sending the list of tags in the `tags` fields."
+          },
+          "tags": {
+            "type": "array",
+            "description": "The list of EMV tags. Not required unless the `tlv` field is absent.",
+            "items": {
+              "$ref": "#/components/schemas/EmvTag"
+            }
+          },
+          "firstDigitOfPan": {
+            "maxLength": 1,
+            "minLength": 1,
+            "type": "string",
+            "description": "The first digit of the primary account number (PAN) / card number."
+          },
+          "cardholderSignature": {
+            "type": "string",
+            "description": "Cardholder's signature in the format described in the [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_signature_field_format) section."
+          },
+          "contactless": {
+            "type": "boolean",
+            "description": "Indicates that the card details were captured by a contactless reader."
+          },
+          "ebtDetails": {
+            "$ref": "#/components/schemas/EbtDetails"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "default": "CHECKING"
+          }
+        }
+      },
+      "FullyEncryptedKeyedDataFormat": {
+        "required": [
+          "device",
+          "encryptedData"
+        ],
+        "type": "object",
+        "properties": {
+          "dataFormat": {
+            "type": "string",
+            "default": "PLAIN_TEXT"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "encryptedData": {
+            "type": "string",
+            "description": "The full card data encrypted by the device."
+          },
+          "firstDigitOfPan": {
+            "maxLength": 1,
+            "minLength": 1,
+            "type": "string",
+            "description": "The first digit of the primary account number (PAN) / card number."
+          }
+        }
+      },
+      "KeyedDataFormat": {
+        "type": "object",
+        "properties": {
+          "dataFormat": {
+            "type": "string",
+            "default": "PLAIN_TEXT"
+          }
+        },
+        "description": "The card details which can be sent in these three different formats: `PLAIN_TEXT` (Default, if not specified), `FULLY_ENCRYPTED`, `PARTIALLY_ENCRYPTED`",
+        "discriminator": {
+          "propertyName": "dataFormat",
+          "mapping": {
+            "PLAIN_TEXT": "#/components/schemas/PlainTextKeyedDataFormat",
+            "FULLY_ENCRYPTED": "#/components/schemas/FullyEncryptedKeyedDataFormat",
+            "PARTIALLY_ENCRYPTED": "#/components/schemas/PartiallyEncryptedKeyedDataFormat"
+          }
+        }
+      },
+      "KeyedPayload": {
+        "required": [
+          "cardDetails",
+          "payloadType"
+        ],
+        "type": "object",
+        "properties": {
+          "payloadType": {
+            "type": "string"
+          },
+          "cardholderName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The cardholder's name as it appears on the card."
+          },
+          "cardDetails": {
+            "$ref": "#/components/schemas/KeyedDataFormat"
+          },
+          "pinDetails": {
+            "$ref": "#/components/schemas/DukptPinDetails"
+          },
+          "ebtDetails": {
+            "$ref": "#/components/schemas/EbtDetails"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "default": "CHECKING"
+          }
+        }
+      },
+      "MagStripePayload": {
+        "required": [
+          "device",
+          "encryptedData",
+          "payloadType"
+        ],
+        "type": "object",
+        "properties": {
+          "payloadType": {
+            "type": "string"
+          },
+          "downgradeTo": {
+            "type": "string",
+            "description": "This field gives clients the ability to reprocess offline transactions that were not approved initially in a different entry mode.<br />For instance, `MAG_STRIPE` transactions are allowed to be downgraded to `KEYED`.",
+            "enum": [
+              "MAG_STRIPE",
+              "KEYED"
+            ]
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "encryptedData": {
+            "type": "string",
+            "description": "The encrypted data captured by the magnetic stripe reader."
+          },
+          "additionalTlvData": {
+            "type": "string",
+            "description": "Additional TLV (Tag-Length-Value) data which is sometimes required for contactless transactions."
+          },
+          "firstDigitOfPan": {
+            "maxLength": 1,
+            "minLength": 1,
+            "type": "string",
+            "description": "The first digit of the primary account number (PAN) / card number."
+          },
+          "cardholderName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The cardholder's name as it appears on the card."
+          },
+          "cardholderSignature": {
+            "type": "string",
+            "description": "Cardholder's signature in the format described in the [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters#the_signature_field_format) section."
+          },
+          "contactless": {
+            "type": "boolean",
+            "description": "Indicates that the card details were captured by a contactless reader."
+          },
+          "fallback": {
+            "type": "boolean",
+            "description": "Indicates that the chip of the card could not be read due to a technical issue which resulted in the technology “falling back” to a magnetic stripe transaction."
+          },
+          "fallbackReason": {
+            "type": "string",
+            "description": "The reason that caused the fallback.",
+            "enum": [
+              "TECHNICAL",
+              "EMPTY_CANDIDATE_LIST"
+            ]
+          },
+          "pinDetails": {
+            "$ref": "#/components/schemas/DukptPinDetails"
+          },
+          "ebtDetails": {
+            "$ref": "#/components/schemas/EbtDetails"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "default": "CHECKING"
+          }
+        }
+      },
+      "PartiallyEncryptedKeyedDataFormat": {
+        "required": [
+          "device",
+          "encryptedPan",
+          "expiryDate",
+          "maskedPan"
+        ],
+        "type": "object",
+        "properties": {
+          "dataFormat": {
+            "type": "string",
+            "default": "PLAIN_TEXT"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "encryptedPan": {
+            "type": "string",
+            "description": "The primary account number (PAN) / card number encrypted by the device."
+          },
+          "maskedPan": {
+            "maxLength": 19,
+            "minLength": 12,
+            "type": "string",
+            "description": "The card number masked with the character `*`.<br />According to PCI DSS, only the first six and last four digits may be displayed. For example: `548010******5929`"
+          },
+          "expiryDate": {
+            "pattern": "[0-9]{4}",
+            "type": "string",
+            "description": "The card's expiration date in the format `MMYY`."
+          },
+          "cvv": {
+            "pattern": "[0-9]{3,4}",
+            "type": "string",
+            "description": "The card's security code."
+          },
+          "issueNumber": {
+            "pattern": "[0-9]{1,2}",
+            "type": "string",
+            "description": "The card's issue number."
+          }
+        }
+      },
+      "Payload": {
+        "required": [
+          "payloadType"
+        ],
+        "type": "object",
+        "properties": {
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "default": "CHECKING"
+          },
+          "payloadType": {
+            "type": "string"
+          }
+        },
+        "description": "Payload that carries the customer's card or account details.<br />Worldnet currently supports the following types of payloads for secure credentials registrations: [`EMV`, `KEYED`, `MAG_STRIPE`]",
+        "discriminator": {
+          "propertyName": "payloadType",
+          "mapping": {
+            "EMV": "#/components/schemas/EmvPayload",
+            "KEYED": "#/components/schemas/KeyedPayload",
+            "MAG_STRIPE": "#/components/schemas/MagStripePayload",
+            "DIGITAL_WALLET": "#/components/schemas/DigitalWalletPayload",
+            "SECURE_CREDENTIALS": "#/components/schemas/SecureCredentialsPayload"
+          }
+        }
+      },
+      "PlainTextKeyedDataFormat": {
+        "required": [
+          "cardNumber",
+          "expiryDate"
+        ],
+        "type": "object",
+        "properties": {
+          "dataFormat": {
+            "type": "string",
+            "default": "PLAIN_TEXT"
+          },
+          "cardNumber": {
+            "maxLength": 19,
+            "minLength": 12,
+            "type": "string",
+            "description": "The card number, as a string without any separators."
+          },
+          "expiryDate": {
+            "pattern": "[0-9]{4}",
+            "type": "string",
+            "description": "The card's expiration date in the format `MMYY`."
+          },
+          "cvv": {
+            "pattern": "[0-9]{3,4}",
+            "type": "string",
+            "description": "The card's security code."
+          },
+          "issueNumber": {
+            "pattern": "[0-9]{1,2}",
+            "type": "string",
+            "description": "The card's issue number."
+          }
+        }
+      },
+      "SecureCredentialsPayload": {
+        "required": [
+          "credentialsNumber",
+          "payloadType"
+        ],
+        "type": "object",
+        "properties": {
+          "payloadType": {
+            "type": "string"
+          },
+          "credentialsNumber": {
+            "maxLength": 19,
+            "minLength": 12,
+            "type": "string",
+            "description": "The unique number assigned by Worldnet to represent the stored credentials."
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "default": "CHECKING"
+          }
+        }
+      },
+      "CustomField": {
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 56,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "description": "List of custom fields to add or update. An empty list will lead to the removal of any existing additional data associated with the credentials."
+      },
+      "SecureCredentials": {
+        "required": [
+          "credentialsNumber",
+          "maskedPan",
+          "merchantReference",
+          "terminal"
+        ],
+        "type": "object",
+        "properties": {
+          "terminal": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string",
+            "description": "The terminal which is the credentials' owner. It means that even though the credentials can be shared to perform transactions, update and delete operations can only be requested by owners."
+          },
+          "merchantReference": {
+            "maxLength": 48,
+            "minLength": 1,
+            "type": "string",
+            "description": "Unique merchant reference that identifies the stored credentials on both platforms.\n\n**Note:** Clients must be able to store this value in order to eventually retrieve, update and delete the stored credentials."
+          },
+          "credentialsNumber": {
+            "maxLength": 19,
+            "minLength": 12,
+            "type": "string",
+            "description": "The unique number that should be used to identify the credentials when performing transactions.<br />This token is assigned by Worldnet and follows the same format of regular card numbers:\n\n- A six-digit identification number which is `296753`.\n- A variable length (up to 12 digits) individual identifier.\n- A single check digit calculated using the Luhn algorithm."
+          },
+          "maskedPan": {
+            "maxLength": 19,
+            "minLength": 12,
+            "type": "string",
+            "description": "The number of the tokenised card/account masked as per PCI requirements."
+          },
+          "securityCheck": {
+            "type": "string",
+            "description": "The result of the security checks performed via account verification to determine if the account is valid and in good standing. Depending on the Payment Processor used by the Terminal, the account verification can be performed in two distinct ways:\n\n- A 0.00 (zero) amount transaction or,\n- A 1.00 (one) currency unit amount transaction followed, when successful, by its voiding (both transactions will appear in your batch).\n\n**Note:** If the account verification fails, the payment credentials are not stored.",
+            "enum": [
+              "NOT_VALIDATED",
+              "CVV_VALIDATED",
+              "ISSUE_NO_VALIDATED",
+              "VALIDATION_FAILED",
+              "CARD_NUMBER_VALIDATED"
+            ]
+          },
+          "additionalDataFields": {
+            "type": "array",
+            "description": "List of custom fields representing the additional information sent by the merchant and stored along with the credentials.",
+            "items": {
+              "$ref": "#/components/schemas/CustomField"
+            }
           },
           "links": {
             "uniqueItems": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/HypermediaLink"
+            }
+          }
+        }
+      },
+      "StoreCredentialsRequest": {
+        "required": [
+          "customerAccount",
+          "terminal"
+        ],
+        "type": "object",
+        "properties": {
+          "terminal": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string",
+            "description": "The terminal number assigned by Worldnet. This field indicates the terminal that owns the credentials, even though, it is possible to share credentials with other terminals.See the *Secure Card* section in [Integration Settings](https://docs.worldnettps.com/doku.php?id=developer:important_integration_settings) for more details about secure credentials sharing feature."
+          },
+          "operator": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The operator who initiated the transaction. If not sent in the request, Worldnet automatically fills this field with the API Key alias."
+          },
+          "merchantReference": {
+            "maxLength": 48,
+            "minLength": 0,
+            "type": "string",
+            "description": "Unique merchant reference that identifies the stored credentials on both platforms.<br />If not provided, Worldnet assigns an auto-generated value to the credentials and returns it in the response."
+          },
+          "ipAddress": {
+            "maxLength": 15,
+            "minLength": 7,
+            "type": "string",
+            "description": "The IP address that originated the request."
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "customerAccount": {
+            "$ref": "#/components/schemas/Payload"
+          },
+          "additionalDataFields": {
+            "type": "array",
+            "description": "List of custom fields which are used to add extra information to stored credentials. Their values are going to be stored and used by Worldnet for the requests sent to the terminal's receipt and validation webhooks.<br />To understand more visit the section regarding [Special Fields and Parameters](https://docs.worldnettps.com/doku.php?id=developer:api_specification:special_fields_and_parameters).",
+            "items": {
+              "$ref": "#/components/schemas/CustomField"
+            }
+          }
+        }
+      },
+      "CardDetails": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "default": "CARD"
+          },
+          "cardNumber": {
+            "maxLength": 19,
+            "minLength": 12,
+            "type": "string",
+            "description": "The card number, as a string without any separators."
+          },
+          "expiryDate": {
+            "pattern": "[0-9]{4}",
+            "type": "string",
+            "description": "The card's expiration date in the format `MMYY`."
+          },
+          "cvv": {
+            "pattern": "[0-9]{3,4}",
+            "type": "string",
+            "description": "The card's security code."
+          },
+          "issueNumber": {
+            "pattern": "[0-9]{1,2}",
+            "type": "string",
+            "description": "The card's issue number."
+          }
+        }
+      },
+      "UpdatablePayload": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "default": "CARD"
+          }
+        },
+        "description": "The details of the card or account to be updated. Keep in mind that, if the terminal supports secure card validation, a change in the card number will trigger a new account verification request.",
+        "discriminator": {
+          "propertyName": "source",
+          "mapping": {
+            "CARD": "#/components/schemas/CardDetails"
+          }
+        }
+      },
+      "UpdateCredentialsRequest": {
+        "required": [
+          "terminal"
+        ],
+        "type": "object",
+        "properties": {
+          "terminal": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string",
+            "description": "The number of the terminal which is the credentials' holder."
+          },
+          "operator": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "description": "The operator who initiated the transaction. If not sent in the request, Worldnet automatically fills this field with the API Key alias."
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "customerAccount": {
+            "$ref": "#/components/schemas/UpdatablePayload"
+          },
+          "additionalDataFields": {
+            "type": "array",
+            "description": "List of custom fields to add or update. An empty list will lead to the removal of any existing additional data associated with the credentials.",
+            "items": {
+              "$ref": "#/components/schemas/CustomField"
             }
           }
         }
@@ -2066,7 +4031,7 @@
       },
       "Bearer": {
         "type": "http",
-        "description": "Use `Bearer` authentication scheme to prove your identity in order to access protected resources.\n",
+        "description": "Use `Bearer` authentication scheme to prove your identity and access protected resources.\n",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
