@@ -3966,6 +3966,146 @@ components:
           maxLength: 10
           minLength: 0
           type: string
+    AuthorizeNetBankSettings:
+      required:
+      - apiLoginId
+      - transactionKey
+      type: object
+      properties:
+        allowMulticurrency:
+          type: boolean
+        allowMoto:
+          type: boolean
+        allowInternet:
+          type: boolean
+        allowRecurring:
+          type: boolean
+        apiLoginId:
+          maxLength: 20
+          minLength: 8
+          type: string
+        transactionKey:
+          maxLength: 16
+          minLength: 16
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+    AuthorizeNetFeatures:
+      type: object
+      properties:
+        allowAcquiring:
+          type: boolean
+        allowDashboard:
+          type: boolean
+        allowBulkPayments:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+        enableDecryptx:
+          type: boolean
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        shopify:
+          $ref: '#/components/schemas/Shopify'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    AuthorizeNetFraudDetection:
+      type: object
+      properties:
+        allowUnreferencedRefunds:
+          type: boolean
+        unreferencedRefundAmountLimit:
+          type: integer
+          format: int32
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+        addressVerification:
+          $ref: '#/components/schemas/AddressVerificationSystem'
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+        sentinelDefend:
+          $ref: '#/components/schemas/SentinelDefend'
+    AuthorizeNetIntegrationSettings:
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+        enableAutoReady:
+          type: boolean
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        mpiReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    AuthorizeNetTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/AuthorizeNetBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/AuthorizeNetFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/AuthorizeNetFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/AuthorizeNetIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: Authorize.Net
     CardLevelLimit:
       type: object
       properties:
@@ -4169,6 +4309,165 @@ components:
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: Credorax
+    CtPaymentsBankSettings:
+      required:
+      - bankCompanyId
+      - bankMerchantId
+      type: object
+      properties:
+        allowMoto:
+          type: boolean
+        allowInternet:
+          type: boolean
+        allowChp:
+          type: boolean
+        defaultTerminalType:
+          type: string
+          enum:
+          - MOTO
+          - CHP
+        allowRecurring:
+          type: boolean
+        bankMerchantId:
+          pattern: '[0-9]{1,13}'
+          type: string
+        bankCompanyId:
+          pattern: '[0-9]{1,5}'
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+    CtPaymentsFeatures:
+      type: object
+      properties:
+        allowAcquiring:
+          type: boolean
+        allowDashboard:
+          type: boolean
+        allowBulkPayments:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+        enableDecryptx:
+          type: boolean
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        shopify:
+          $ref: '#/components/schemas/Shopify'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    CtPaymentsFraudDetection:
+      type: object
+      properties:
+        allowCardholderSignatureBypass:
+          type: boolean
+        allowUnreferencedRefunds:
+          type: boolean
+        unreferencedRefundAmountLimit:
+          type: integer
+          format: int32
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+        sentinelDefend:
+          $ref: '#/components/schemas/SentinelDefend'
+    CtPaymentsIntegrationSettings:
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+        enableAutoReady:
+          type: boolean
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    CtPaymentsLocationDetails:
+      required:
+      - country
+      - timeZone
+      type: object
+      properties:
+        cardAcceptorName:
+          maxLength: 25
+          minLength: 0
+          type: string
+        localPhoneNumber:
+          maxLength: 11
+          minLength: 0
+          type: string
+        country:
+          maxLength: 2
+          minLength: 2
+          type: string
+        timeZone:
+          type: string
+    CtPaymentsTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/CtPaymentsBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/CtPaymentsLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/CtPaymentsFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/CtPaymentsFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/CtPaymentsIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: CT Payments
     CyberSourceBankSettings:
       required:
       - bankMerchantId
@@ -4648,6 +4947,471 @@ components:
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: Elavon
+    FdrcBankSettings:
+      required:
+      - bankMerchantId
+      - bankTerminalId
+      - frontEndGroupId
+      type: object
+      properties:
+        allowMoto:
+          type: boolean
+        allowInternet:
+          type: boolean
+        allowChp:
+          type: boolean
+        defaultTerminalType:
+          type: string
+          enum:
+          - MOTO
+          - CHP
+        allowRecurring:
+          type: boolean
+        bankMerchantId:
+          pattern: ^[a-zA-Z0-9]{1,16}$
+          type: string
+        bankTerminalId:
+          pattern: ^[a-zA-Z0-9]{1,8}$
+          type: string
+        frontEndGroupId:
+          pattern: '[0-9]{5}'
+          type: string
+        ecommerceUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        customerServicePhone:
+          maxLength: 25
+          minLength: 5
+          pattern: (\+?\s*\d+)?((\s*[\-\(/]?)(\d+)(\s*[\-\)/]?))+$
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+    FdrcEnhancedData:
+      required:
+      - merchantTaxId
+      type: object
+      properties:
+        enable:
+          type: boolean
+        enableTemplateAutofill:
+          type: boolean
+        txnDataLevel:
+          type: string
+          enum:
+          - STANDARD
+          - LEVEL_II
+          - LEVEL_III
+        apiShippingAddressMode:
+          type: string
+          enum:
+          - EXACT
+          - POSTAL
+        merchantTaxId:
+          maxLength: 15
+          minLength: 0
+          type: string
+    FdrcFeatures:
+      type: object
+      properties:
+        allowDashboard:
+          type: boolean
+        allowBulkPayments:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+        enableDecryptx:
+          type: boolean
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        shopify:
+          $ref: '#/components/schemas/Shopify'
+        enhancedData:
+          $ref: '#/components/schemas/FdrcEnhancedData'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    FdrcFraudDetection:
+      type: object
+      properties:
+        allowCardholderSignatureBypass:
+          type: boolean
+        allowUnreferencedRefunds:
+          type: boolean
+        unreferencedRefundAmountLimit:
+          type: integer
+          format: int32
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+        addressVerification:
+          $ref: '#/components/schemas/AddressVerificationSystem'
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+        sentinelDefend:
+          $ref: '#/components/schemas/SentinelDefend'
+    FdrcIntegrationSettings:
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+        enableAutoReady:
+          type: boolean
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        mpiReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    FdrcTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/FdrcBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/FdrcFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/FdrcFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/FdrcIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: FDRC PTCP
+    FiServBankSettings:
+      required:
+      - cardAcceptorId
+      - cardAcceptorTerminalId
+      - fnsNumber
+      type: object
+      properties:
+        allowChp:
+          type: boolean
+        defaultTerminalType:
+          type: string
+          enum:
+          - MOTO
+          - CHP
+        cardAcceptorId:
+          maxLength: 48
+          minLength: 0
+          type: string
+        cardAcceptorTerminalId:
+          pattern: '[0-9]{1,13}'
+          type: string
+        fnsNumber:
+          maxLength: 7
+          minLength: 0
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+    FiServFraudDetection:
+      type: object
+      properties:
+        allowCardholderSignatureBypass:
+          type: boolean
+        allowUnreferencedRefunds:
+          type: boolean
+        unreferencedRefundAmountLimit:
+          type: integer
+          format: int32
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+        addressVerification:
+          $ref: '#/components/schemas/AddressVerificationSystem'
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+    FiServIntegrationSettings:
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+        enableAutoReady:
+          type: boolean
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        mpiReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    FiServLocationDetails:
+      required:
+      - country
+      - timeZone
+      type: object
+      properties:
+        cardAcceptorName:
+          maxLength: 25
+          minLength: 0
+          type: string
+        country:
+          maxLength: 2
+          minLength: 2
+          type: string
+        usState:
+          maxLength: 5
+          minLength: 5
+          type: string
+        city:
+          maxLength: 13
+          minLength: 0
+          type: string
+        timeZone:
+          type: string
+    FiServTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/FiServBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/FiServLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/TerminalFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/FiServFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/FiServIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: FiServ
+    IntegraPayBankSettings:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        allowMulticurrency:
+          type: boolean
+        allowMoto:
+          type: boolean
+        allowInternet:
+          type: boolean
+        username:
+          maxLength: 48
+          minLength: 0
+          type: string
+        password:
+          maxLength: 512
+          minLength: 0
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+    IntegraPayFeatures:
+      type: object
+      properties:
+        allowAcquiring:
+          type: boolean
+        allowDashboard:
+          type: boolean
+        allowBulkPayments:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+        enableDecryptx:
+          type: boolean
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        shopify:
+          $ref: '#/components/schemas/Shopify'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    IntegraPayFraudDetection:
+      type: object
+      properties:
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+        addressVerification:
+          $ref: '#/components/schemas/AddressVerificationSystem'
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        threeDSecure:
+          $ref: '#/components/schemas/ThreeDSecure'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+        sentinelDefend:
+          $ref: '#/components/schemas/SentinelDefend'
+    IntegraPayIntegrationSettings:
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+        enableAutoReady:
+          type: boolean
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        mpiReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+        enableEnable3dsXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    IntegraPayTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/IntegraPayBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/IntegraPayFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/IntegraPayFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/IntegraPayIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchProcessing'
+      x-discriminator-value: IntegraPay
     MaxMind:
       type: object
       properties:
@@ -4660,6 +5424,145 @@ components:
           exclusiveMaximum: false
           type: number
           format: double
+    NmiBankSettings:
+      required:
+      - bankMerchantId
+      - bankMerchantPassword
+      type: object
+      properties:
+        allowMulticurrency:
+          type: boolean
+        allowMoto:
+          type: boolean
+        allowInternet:
+          type: boolean
+        allowRecurring:
+          type: boolean
+        bankMerchantId:
+          maxLength: 24
+          minLength: 1
+          type: string
+        bankMerchantPassword:
+          maxLength: 512
+          minLength: 0
+          type: string
+        defaultCardholderEmail:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+        forceUniqueOrderId:
+          type: boolean
+    NmiFeatures:
+      type: object
+      properties:
+        allowAcquiring:
+          type: boolean
+        allowDashboard:
+          type: boolean
+        allowBulkPayments:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+        enableDecryptx:
+          type: boolean
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        shopify:
+          $ref: '#/components/schemas/Shopify'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    NmiFraudDetection:
+      type: object
+      properties:
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+        addressVerification:
+          $ref: '#/components/schemas/AddressVerificationSystem'
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+        sentinelDefend:
+          $ref: '#/components/schemas/SentinelDefend'
+    NmiIntegrationSettings:
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+        enableAutoReady:
+          type: boolean
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        mpiReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    NmiTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/NmiBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/NmiFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/NmiFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/NmiIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: NMI
     PayLink:
       type: object
       properties:
@@ -5001,6 +5904,13 @@ components:
           CyberSourceSoap: '#/components/schemas/CyberSourceSoapTerminal'
           TSYS: '#/components/schemas/TsysSierraTerminal'
           TSYS Saratoga: '#/components/schemas/TsysSaratogaTerminal'
+          NMI: '#/components/schemas/NmiTerminal'
+          FiServ: '#/components/schemas/FiServTerminal'
+          FDRC PTCP: '#/components/schemas/FdrcTerminal'
+          IntegraPay: '#/components/schemas/IntegraPayTerminal'
+          CT Payments: '#/components/schemas/CtPaymentsTerminal'
+          Authorize.Net: '#/components/schemas/AuthorizeNetTerminal'
+          Unassigned: '#/components/schemas/UnassignedTerminal'
     TerminalAchJackHenryProcessing:
       type: object
       properties:
@@ -5016,6 +5926,22 @@ components:
           maxLength: 1024
           minLength: 0
           type: string
+    TerminalAchProcessing:
+      type: object
+      properties:
+        enable:
+          type: boolean
+    TerminalFeatures:
+      type: object
+      properties:
+        allowDashboard:
+          type: boolean
+        allowBulkPayments:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        enableDecryptx:
+          type: boolean
     TerminalLevelLimit:
       required:
       - limitScope
@@ -5741,6 +6667,69 @@ components:
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: TSYS
+    UnassignedBankSettings:
+      type: object
+      properties:
+        allowMoto:
+          type: boolean
+        allowInternet:
+          type: boolean
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+    UnassignedFeatures:
+      type: object
+      properties:
+        allowAcquiring:
+          type: boolean
+        allowScheduleReports:
+          type: boolean
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    UnassignedIntegrationSettings:
+      type: object
+      properties:
+        enableBackgroundValidation:
+          type: boolean
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+    UnassignedTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/UnassignedBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/UnassignedFeatures'
+          integrationSettings:
+            $ref: '#/components/schemas/UnassignedIntegrationSettings'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: Unassigned
     VacpG2GBankSettings:
       required:
       - bankMerchantId
