@@ -44,7 +44,8 @@ paths:
       tags:
       - tokens
       summary: Authenticate
-      description: Use this operation to exchange your `API Key` for a `JWT Token` that will give you access to the API.
+      description: Use this operation to exchange your `API Key` for a `JWT Token`
+        that will give you access to the API.
       operationId: authenticate
       parameters:
       - name: Authorization
@@ -68,80 +69,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessToken'
         401:
-          description: Authentication failed, the API Key has either been revoked or not found
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceError'
-        403:
-          description: Authorization failed, the requester's host is not allowed to use the API Key
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ServiceError'
-  /api/v2/boarding/merchants:
-    get:
-      tags:
-      - merchants
-      summary: List Merchants
-      operationId: listMerchants
-      parameters:
-      - name: active
-        in: query
-        schema:
-          type: boolean
-          default: true
-      - name: pageSize
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      responses:
-        200:
-          description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantPaginatedResult'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
+          description: Authentication failed, the API Key has either been revoked
+            or not found
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -154,8 +83,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
+          description: Authorization failed, the requester's host is not allowed to
+            use the API Key
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -167,164 +96,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - merchants:full-access
-        - merchants:read-only
-    post:
-      tags:
-      - merchants
-      summary: Create Merchant
-      operationId: createMerchant
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Merchant'
-        required: true
-      responses:
-        201:
-          description: Created
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Merchant'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - merchants:full-access
   /api/v2/boarding/merchants/{merchantId}:
     get:
       tags:
@@ -458,120 +229,6 @@ paths:
             schema:
               $ref: '#/components/schemas/Merchant'
         required: true
-      responses:
-        200:
-          description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Merchant'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - merchants:full-access
-  /api/v2/boarding/merchants/{merchantId}/activate:
-    patch:
-      tags:
-      - merchants
-      summary: Activate Merchant
-      operationId: activateMerchant
-      parameters:
-      - name: merchantId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
       responses:
         200:
           description: OK
@@ -1284,6 +941,126 @@ paths:
       security:
       - Bearer:
         - users:full-access
+  /api/v2/boarding/merchants/{merchantId}/users/{userId}/deactivate:
+    patch:
+      tags:
+      - users
+      summary: Deactivate User
+      operationId: deactivateUser
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: merchantId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - users:full-access
   /api/v2/boarding/merchants/{merchantId}/users/{userId}/lock:
     patch:
       tags:
@@ -1524,25 +1301,24 @@ paths:
       security:
       - Bearer:
         - users:full-access
-  /api/v2/boarding/merchants/{merchantId}/users/{userId}/deactivate:
-    patch:
+  /api/v2/boarding/merchants:
+    get:
       tags:
-      - users
-      summary: Deactivate User
-      operationId: deactivateUser
+      - merchants
+      summary: List Merchants
+      operationId: listMerchants
       parameters:
-      - name: userId
-        in: path
-        required: true
+      - name: active
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: pageSize
+        in: query
         schema:
           type: integer
           format: int32
-      - name: merchantId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
+          default: 100
       responses:
         200:
           description: OK
@@ -1554,9 +1330,9 @@ paths:
                 type: string
                 format: uuid
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/MerchantPaginatedResult'
         400:
           description: 'Bad Request : Indicates that the server cannot or will not
             process the request due to a malformed request syntax.'
@@ -1643,7 +1419,348 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - Bearer:
-        - users:full-access
+        - merchants:full-access
+        - merchants:read-only
+    post:
+      tags:
+      - merchants
+      summary: Create Merchant
+      operationId: createMerchant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Merchant'
+        required: true
+      responses:
+        201:
+          description: Created
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - merchants:full-access
+  /api/v2/boarding/merchants/{merchantId}/deactivate:
+    patch:
+      tags:
+      - merchants
+      summary: Deactivate Merchant
+      operationId: deactivateMerchant
+      parameters:
+      - name: merchantId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - merchants:full-access
+  /api/v2/boarding/merchants/{merchantId}/activate:
+    patch:
+      tags:
+      - merchants
+      summary: Activate Merchant
+      operationId: activateMerchant
+      parameters:
+      - name: merchantId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - merchants:full-access
   /api/v2/boarding/merchants/{merchantId}/terminals/{terminalNumber}:
     get:
       tags:
@@ -2371,352 +2488,6 @@ paths:
       security:
       - Bearer:
         - terminals:full-access
-  /api/v2/boarding/merchants/{merchantId}/deactivate:
-    patch:
-      tags:
-      - merchants
-      summary: Deactivate Merchant
-      operationId: deactivateMerchant
-      parameters:
-      - name: merchantId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      responses:
-        200:
-          description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Merchant'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - merchants:full-access
-  /api/v2/boarding/merchantPortfolios:
-    get:
-      tags:
-      - merchantPortfolios
-      summary: List Merchant Portfolios
-      operationId: listMerchantPortfolios
-      parameters:
-      - name: active
-        in: query
-        schema:
-          type: boolean
-          default: true
-      - name: pageSize
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      responses:
-        200:
-          description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantPortfolioPaginatedResult'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - merchant-portfolios:full-access
-        - merchant-portfolios:read-only
-    post:
-      tags:
-      - merchantPortfolios
-      summary: Create Merchant Portfolio
-      operationId: createMerchantPortfolio
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MerchantPortfolio'
-        required: true
-      responses:
-        201:
-          description: Created
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MerchantPortfolio'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - merchant-portfolios:full-access
   /api/v2/boarding/merchantPortfolios/{merchantPortfolioId}:
     get:
       tags:
@@ -2853,6 +2624,238 @@ paths:
       responses:
         200:
           description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantPortfolio'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - merchant-portfolios:full-access
+  /api/v2/boarding/merchantPortfolios:
+    get:
+      tags:
+      - merchantPortfolios
+      summary: List Merchant Portfolios
+      operationId: listMerchantPortfolios
+      parameters:
+      - name: active
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 100
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantPortfolioPaginatedResult'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - merchant-portfolios:full-access
+        - merchant-portfolios:read-only
+    post:
+      tags:
+      - merchantPortfolios
+      summary: Create Merchant Portfolio
+      operationId: createMerchantPortfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantPortfolio'
+        required: true
+      responses:
+        201:
+          description: Created
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -3179,19 +3182,24 @@ paths:
       security:
       - Bearer:
         - merchant-portfolios:full-access
-  /api/v2/boarding/partners/{partnerPortfolioId}/activate:
-    patch:
+  /api/v2/boarding/partners:
+    get:
       tags:
       - partners
-      summary: Activate Partner
-      operationId: activatePartner
+      summary: List Partners
+      operationId: listPartners
       parameters:
-      - name: partnerPortfolioId
-        in: path
-        required: true
+      - name: active
+        in: query
+        schema:
+          type: boolean
+          default: true
+      - name: pageSize
+        in: query
         schema:
           type: integer
           format: int32
+          default: 100
       responses:
         200:
           description: OK
@@ -3205,7 +3213,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PartnerPortfolio'
+                $ref: '#/components/schemas/PartnerPaginatedResult'
         400:
           description: 'Bad Request : Indicates that the server cannot or will not
             process the request due to a malformed request syntax.'
@@ -3293,22 +3301,21 @@ paths:
       security:
       - Bearer:
         - partners:full-access
-  /api/v2/boarding/partners/{partnerPortfolioId}/deactivate:
-    patch:
+        - partners:read-only
+    post:
       tags:
       - partners
-      summary: Deactivate Partner
-      operationId: deactivatePartner
-      parameters:
-      - name: partnerPortfolioId
-        in: path
+      summary: Create Partner
+      operationId: createPartner
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerPortfolio'
         required: true
-        schema:
-          type: integer
-          format: int32
       responses:
-        200:
-          description: OK
+        201:
+          description: Created
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -3641,140 +3648,22 @@ paths:
       security:
       - Bearer:
         - partners:full-access
-  /api/v2/boarding/partners:
-    get:
+  /api/v2/boarding/partners/{partnerPortfolioId}/activate:
+    patch:
       tags:
       - partners
-      summary: List Partners
-      operationId: listPartners
+      summary: Activate Partner
+      operationId: activatePartner
       parameters:
-      - name: active
-        in: query
-        schema:
-          type: boolean
-          default: true
-      - name: pageSize
-        in: query
+      - name: partnerPortfolioId
+        in: path
+        required: true
         schema:
           type: integer
           format: int32
-          default: 100
       responses:
         200:
           description: OK
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PartnerPaginatedResult'
-        400:
-          description: 'Bad Request : Indicates that the server cannot or will not
-            process the request due to a malformed request syntax.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: 'Unauthorized : Indicates that the request has not been applied
-            because it lacks valid authentication credentials.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        403:
-          description: 'Forbidden : Indicates that the server refuses to authorize
-            the request because it lacks the required permissions.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: 'Not Found : Indicates that the server cannot find the requested
-            resource.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: 'Unprocessable Entity : Indicates that the request is syntactically
-            correct but semantically incorrect.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: 'Internal Server Error : Server encountered an unexpected condition
-            that prevented it from fulfilling the request.'
-          headers:
-            X-Request-Id:
-              description: Unique identifier assigned by Worldnet for each request.
-              style: simple
-              schema:
-                type: string
-                format: uuid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      security:
-      - Bearer:
-        - partners:full-access
-        - partners:read-only
-    post:
-      tags:
-      - partners
-      summary: Create Partner
-      operationId: createPartner
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PartnerPortfolio'
-        required: true
-      responses:
-        201:
-          description: Created
           headers:
             X-Request-Id:
               description: Unique identifier assigned by Worldnet for each request.
@@ -3873,12 +3762,126 @@ paths:
       security:
       - Bearer:
         - partners:full-access
-  /api/v2/boarding/templates/terminals/{templateName}:
+  /api/v2/boarding/partners/{partnerPortfolioId}/deactivate:
+    patch:
+      tags:
+      - partners
+      summary: Deactivate Partner
+      operationId: deactivatePartner
+      parameters:
+      - name: partnerPortfolioId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: OK
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerPortfolio'
+        400:
+          description: 'Bad Request : Indicates that the server cannot or will not
+            process the request due to a malformed request syntax.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: 'Unauthorized : Indicates that the request has not been applied
+            because it lacks valid authentication credentials.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: 'Forbidden : Indicates that the server refuses to authorize
+            the request because it lacks the required permissions.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: 'Not Found : Indicates that the server cannot find the requested
+            resource.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: 'Unprocessable Entity : Indicates that the request is syntactically
+            correct but semantically incorrect.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: 'Internal Server Error : Server encountered an unexpected condition
+            that prevented it from fulfilling the request.'
+          headers:
+            X-Request-Id:
+              description: Unique identifier assigned by Worldnet for each request.
+              style: simple
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - Bearer:
+        - partners:full-access
+  /api/v2/boarding/templates/users/{templateName}:
     get:
       tags:
       - templates
-      summary: Get Terminal Template
-      operationId: getTerminalTemplate
+      summary: Get User Template
+      operationId: getUserTemplate
       parameters:
       - name: templateName
         in: path
@@ -3898,7 +3901,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Terminal'
+                $ref: '#/components/schemas/User'
         400:
           description: 'Bad Request : Indicates that the server cannot or will not
             process the request due to a malformed request syntax.'
@@ -4101,12 +4104,12 @@ paths:
       - Bearer:
         - templates:full-access
         - templates:read-only
-  /api/v2/boarding/templates/users/{templateName}:
+  /api/v2/boarding/templates/terminals/{templateName}:
     get:
       tags:
       - templates
-      summary: Get User Template
-      operationId: getUserTemplate
+      summary: Get Terminal Template
+      operationId: getTerminalTemplate
       parameters:
       - name: templateName
         in: path
@@ -4126,7 +4129,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Terminal'
         400:
           description: 'Bad Request : Indicates that the server cannot or will not
             process the request due to a malformed request syntax.'
@@ -4249,27 +4252,68 @@ components:
           type: array
           items:
             type: string
-    ServiceError:
+    Error:
+      required:
+      - debugIdentifier
+      - details
       type: object
       properties:
-        code:
+        debugIdentifier:
           type: string
-        message:
-          type: string
-        validationErrors:
+          description: Clients should use this field when communicating to our support
+            team. It allows us to easily identify the request and consequently the
+            reason behind its failure.
+        details:
           uniqueItems: true
           type: array
           items:
-            $ref: '#/components/schemas/ValidationError'
-    ValidationError:
+            $ref: '#/components/schemas/ErrorDetail'
+    ErrorDetail:
+      required:
+      - errorCode
+      - errorMessage
       type: object
       properties:
-        code:
+        errorCode:
           type: string
-        message:
+          description: A code assigned by Worldnet to each type of failure.
+        errorMessage:
           type: string
-        target:
+          description: A brief description of the given error.
+        about:
           type: string
+          description: A link to an external documentation that fully explains the
+            issue.
+          format: uri
+        source:
+          $ref: '#/components/schemas/ErrorSource'
+    ErrorSource:
+      required:
+      - location
+      type: object
+      properties:
+        location:
+          type: string
+          description: The HTTP message element that contains the invalid value.
+          enum:
+          - HEADER
+          - BODY
+          - PATH
+          - QUERY
+        resource:
+          type: string
+          description: For errors in the request body, this field points to the object
+            that contains the invalid property.
+        property:
+          type: string
+          description: The field or parameter that carries the invalid value.
+        value:
+          type: string
+          description: Invalid value sent by the client.
+        expected:
+          type: string
+          description: Here the server gives a hint of how the client should fix the
+            issue.
     Merchant:
       required:
       - address1
@@ -4417,63 +4461,6 @@ components:
           enum:
           - ALL
           - COMPLETED
-    Error:
-      required:
-      - debugIdentifier
-      - details
-      type: object
-      properties:
-        debugIdentifier:
-          type: string
-          description: Clients should use this field when communicating to our support team. It allows us to easily identify the request and consequently the reason behind its failure.
-        details:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorDetail'
-    ErrorDetail:
-      required:
-      - errorCode
-      - errorMessage
-      type: object
-      properties:
-        errorCode:
-          type: string
-          description: A code assigned by Worldnet to each type of failure.
-        errorMessage:
-          type: string
-          description: A brief description of the given error.
-        about:
-          type: string
-          description: A link to an external documentation that fully explains the issue.
-          format: uri
-        source:
-          $ref: '#/components/schemas/ErrorSource'
-    ErrorSource:
-      required:
-      - location
-      type: object
-      properties:
-        location:
-          type: string
-          description: The HTTP message element that contains the invalid value.
-          enum:
-          - HEADER
-          - BODY
-          - PATH
-          - QUERY
-        resource:
-          type: string
-          description: For errors in the request body, this field points to the object that contains the invalid property.
-        property:
-          type: string
-          description: The field or parameter that carries the invalid value.
-        value:
-          type: string
-          description: Invalid value sent by the client.
-        expected:
-          type: string
-          description: Here the server gives a hint of how the client should fix the issue.
     User:
       required:
       - merchantId
@@ -4482,13 +4469,13 @@ components:
       - userName
       type: object
       properties:
-        merchantId:
-          type: string
         templateName:
           type: string
         userId:
           type: string
         userName:
+          type: string
+        merchantId:
           type: string
         userEmail:
           type: string
@@ -4605,6 +4592,44 @@ components:
         totalCount:
           type: integer
           format: int64
+    MerchantCompact:
+      type: object
+      properties:
+        merchantId:
+          type: string
+        dbaName:
+          type: string
+        gatewayHost:
+          type: string
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+        contactEmail:
+          type: string
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    MerchantPaginatedResult:
+      required:
+      - data
+      - totalCount
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MerchantCompact'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+        totalCount:
+          type: integer
+          format: int64
     AccountUpdater:
       required:
       - abuMerchantId
@@ -4613,6 +4638,9 @@ components:
       - vauType
       type: object
       properties:
+        enableVau:
+          type: boolean
+          default: false
         vauType:
           type: string
           enum:
@@ -4626,6 +4654,9 @@ components:
           maxLength: 12
           minLength: 0
           type: string
+        enableAbu:
+          type: boolean
+          default: false
         abuType:
           type: string
           enum:
@@ -4650,16 +4681,10 @@ components:
           minLength: 0
           pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
           type: string
-        enableVau:
-          type: boolean
-          default: false
-        enableAbu:
-          type: boolean
-          default: false
     AddressVerificationSystem:
       required:
       - action
-      - apiAddressMode
+      - preferredAddressMode
       type: object
       properties:
         enable:
@@ -4674,7 +4699,7 @@ components:
         compulsory:
           type: boolean
           default: false
-        apiAddressMode:
+        preferredAddressMode:
           type: string
           enum:
           - EXACT
@@ -4899,6 +4924,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -5058,16 +5260,22 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/AuthorizeNetBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/AuthorizeNetFeatures'
           fraudDetection:
             $ref: '#/components/schemas/AuthorizeNetFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/AuthorizeNetIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: Authorize.Net
     CardLevelLimit:
+      required:
+      - card
       type: object
       properties:
         card:
@@ -5099,25 +5307,29 @@ components:
           default: '[N]'
     CardVolumeLimit:
       required:
-      - limitScope
+      - currentValue
+      - limitThreshold
       type: object
       properties:
         limitThreshold:
+          minimum: 1
           type: integer
           format: int32
-        withoutCvvOnly:
-          type: boolean
-        withoutAvsOnly:
-          type: boolean
-        currentValue:
-          type: number
-          format: double
         limitScope:
           type: string
           enum:
           - DAILY
           - MONTHLY
           - SINGLE_TRANSACTION
+        currentValue:
+          maximum: 9999999999
+          exclusiveMaximum: false
+          type: number
+          format: double
+        withoutCvvOnly:
+          type: boolean
+        withoutAvsOnly:
+          type: boolean
     CredoraxBankSettings:
       required:
       - bankMerchantId
@@ -5302,6 +5514,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -5489,12 +5878,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/CredoraxBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/CredoraxFeatures'
           fraudDetection:
             $ref: '#/components/schemas/CredoraxFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/CredoraxIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: Credorax
@@ -5869,6 +6262,8 @@ components:
             $ref: '#/components/schemas/CtPaymentsFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/CtPaymentsIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: CT Payments
@@ -6058,6 +6453,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -6392,6 +6964,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -6458,66 +7207,6 @@ components:
           $ref: '#/components/schemas/PayLink'
         secureCredentials:
           $ref: '#/components/schemas/SecureCredentials'
-    CyberSourceSoapIntegrationSettings:
-      required:
-      - backgroundValidationUrl
-      type: object
-      properties:
-        useUniqueRef:
-          type: boolean
-          default: true
-        enableAutoReady:
-          type: boolean
-          default: true
-        autoReadyAmountLimit:
-          type: integer
-          format: int32
-          default: 0
-        hostedPageVersion:
-          type: string
-          enum:
-          - VERSION_1
-          - VERSION_2
-          default: VERSION_2
-        enableBackgroundValidation:
-          type: boolean
-          default: false
-        backgroundValidationUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        receiptPageUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        mpiReceiptUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        enableAdditionalFieldXmlResponseTag:
-          type: boolean
-          default: true
-        enableOriginalResponseXmlResponseTag:
-          type: boolean
-          default: false
-        enableMaskedCardXmlResponseTag:
-          type: boolean
-          default: false
-        enableSupportsApplePayXmlResponseTag:
-          type: boolean
-          default: true
-        enableSupportsGooglePayXmlResponseTag:
-          type: boolean
-          default: true
-        enableEnable3dsXmlResponseTag:
-          type: boolean
-          default: true
-        enableSupportedCardsXmlResponseTag:
-          type: boolean
-          default: true
     CyberSourceSoapTerminal:
       required:
       - bankSettings
@@ -6531,12 +7220,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/CyberSourceSoapBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/CyberSourceSoapFeatures'
           fraudDetection:
             $ref: '#/components/schemas/CyberSourceFraudDetection'
           integrationSettings:
-            $ref: '#/components/schemas/CyberSourceSoapIntegrationSettings'
+            $ref: '#/components/schemas/CyberSourceIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: CyberSourceSoap
@@ -6553,12 +7246,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/CyberSourceBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/CyberSourceFeatures'
           fraudDetection:
             $ref: '#/components/schemas/CyberSourceFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/CyberSourceIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: CyberSource
@@ -6616,6 +7313,12 @@ components:
       - baseCurrency
       type: object
       properties:
+        allowEdcc:
+          type: boolean
+          default: false
+        edccProvider:
+          type: string
+          readOnly: true
         baseCurrency:
           type: string
           enum:
@@ -6790,12 +7493,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
-        allowEdcc:
-          type: boolean
-          default: false
-        edccProvider:
-          type: string
-          readOnly: true
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -6965,12 +7839,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/ElavonBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/ElavonFeatures'
           fraudDetection:
             $ref: '#/components/schemas/ElavonFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/ElavonIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: Elavon
@@ -7214,8 +8092,8 @@ components:
           default: true
     FdrcEnhancedData:
       required:
-      - apiShippingAddressMode
       - merchantTaxId
+      - preferredShippingAddressMode
       - txnDataLevel
       type: object
       properties:
@@ -7231,15 +8109,15 @@ components:
           - STANDARD
           - LEVEL_II
           - LEVEL_III
-        apiShippingAddressMode:
-          type: string
-          enum:
-          - EXACT
-          - POSTAL
         merchantTaxId:
           maxLength: 15
           minLength: 0
           type: string
+        preferredShippingAddressMode:
+          type: string
+          enum:
+          - EXACT
+          - POSTAL
     FdrcFeatures:
       type: object
       properties:
@@ -7366,12 +8244,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/FdrcBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/FdrcFeatures'
           fraudDetection:
             $ref: '#/components/schemas/FdrcFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/FdrcIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: FDRC PTCP
@@ -7694,7 +8576,7 @@ components:
           maxLength: 2
           minLength: 2
           type: string
-        usState:
+        state:
           maxLength: 5
           minLength: 5
           type: string
@@ -7719,10 +8601,14 @@ components:
             $ref: '#/components/schemas/FiServBankSettings'
           terminalLocation:
             $ref: '#/components/schemas/FiServLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/TerminalFeatures'
           fraudDetection:
             $ref: '#/components/schemas/FiServFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/FiServIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: FiServ
@@ -7910,6 +8796,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -8060,12 +9123,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/IntegraPayBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/IntegraPayFeatures'
           fraudDetection:
             $ref: '#/components/schemas/IntegraPayFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/IntegraPayIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchProcessing'
       x-discriminator-value: IntegraPay
@@ -8270,371 +9337,11 @@ components:
           - ZAR
           - ZMW
           - ZWL
-        allowMoto:
-          type: boolean
-          default: true
-        allowInternet:
-          type: boolean
-          default: false
-        allowRecurring:
-          type: boolean
-          default: true
-        bankMerchantId:
-          maxLength: 24
-          minLength: 1
-          type: string
-        bankMerchantPassword:
-          maxLength: 512
-          minLength: 0
-          type: string
-        defaultCardholderEmail:
-          maxLength: 1024
-          minLength: 0
-          type: string
-        enableAutomaticSettle:
-          type: boolean
-          default: true
-        batchTime:
-          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
-          type: string
-          example: 00:00
-        displayName:
-          maxLength: 14
-          minLength: 0
-          type: string
-        allowEditDisplayName:
-          type: boolean
-          default: false
-        forceUniqueOrderId:
-          type: boolean
-          default: true
-    NmiFeatures:
-      type: object
-      properties:
-        allowAcquiring:
-          type: boolean
-          default: false
-        allowDashboard:
-          type: boolean
-          default: false
-        allowBulkPayments:
-          type: boolean
-          default: false
-        allowScheduleReports:
-          type: boolean
-          default: false
-        allowVirtualTerminalAutoOrderId:
-          type: boolean
-          default: false
-        enableDecryptx:
-          type: boolean
-          default: false
-        payLink:
-          $ref: '#/components/schemas/PayLink'
-        shopify:
-          $ref: '#/components/schemas/Shopify'
-        secureCredentials:
-          $ref: '#/components/schemas/SecureCredentials'
-    NmiFraudDetection:
-      type: object
-      properties:
-        refundPercentageLimit:
-          maximum: 100.00
-          exclusiveMaximum: false
-          type: number
-          format: double
-          default: 100
-        addressVerification:
-          $ref: '#/components/schemas/AddressVerificationSystem'
-        cvvVerification:
-          $ref: '#/components/schemas/CardSecurityCodeVerification'
-        maxMind:
-          $ref: '#/components/schemas/MaxMind'
-        sentinelDefend:
-          $ref: '#/components/schemas/SentinelDefend'
-    NmiIntegrationSettings:
-      required:
-      - backgroundValidationUrl
-      type: object
-      properties:
-        useUniqueRef:
-          type: boolean
-          default: true
-        enableAutoReady:
-          type: boolean
-          default: true
-        autoReadyAmountLimit:
-          type: integer
-          format: int32
-          default: 0
-        hostedPageVersion:
-          type: string
-          enum:
-          - VERSION_1
-          - VERSION_2
-          default: VERSION_2
-        enableBackgroundValidation:
-          type: boolean
-          default: false
-        backgroundValidationUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        receiptPageUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        mpiReceiptUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        enableAdditionalFieldXmlResponseTag:
-          type: boolean
-          default: true
-        enableOriginalResponseXmlResponseTag:
-          type: boolean
-          default: false
-        enableMaskedCardXmlResponseTag:
-          type: boolean
-          default: false
-        enableSupportsApplePayXmlResponseTag:
-          type: boolean
-          default: true
-        enableSupportsGooglePayXmlResponseTag:
-          type: boolean
-          default: true
-        enableEnable3dsXmlResponseTag:
-          type: boolean
-          default: true
-        enableSupportedCardsXmlResponseTag:
-          type: boolean
-          default: true
-    NmiTerminal:
-      required:
-      - bankSettings
-      - paymentProcessor
-      - secret
-      - terminalLocation
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Terminal'
-      - type: object
-        properties:
-          bankSettings:
-            $ref: '#/components/schemas/NmiBankSettings'
-          terminalFeatures:
-            $ref: '#/components/schemas/NmiFeatures'
-          fraudDetection:
-            $ref: '#/components/schemas/NmiFraudDetection'
-          integrationSettings:
-            $ref: '#/components/schemas/NmiIntegrationSettings'
-          achProcessing:
-            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
-      x-discriminator-value: NMI
-    PayLink:
-      type: object
-      properties:
-        enable:
-          type: boolean
-          default: false
-        logoUrl:
-          maxLength: 200
-          minLength: 0
-          type: string
-        footerNotes:
-          maxLength: 2000
-          minLength: 0
-          type: string
-    PaymentFacilitator:
-      required:
-      - subMerchantIdentifier
-      - subMerchantName
-      type: object
-      properties:
-        enable:
-          type: boolean
-          default: false
-        subMerchantName:
-          maxLength: 100
-          minLength: 0
-          type: string
-        subMerchantIdentifier:
-          maxLength: 15
-          minLength: 0
-          type: string
-    SecureCredentials:
-      required:
-      - hostedPageEmailFieldSetup
-      type: object
-      properties:
-        enable:
-          type: boolean
-          default: false
-        enableSecureCardValidation:
-          type: boolean
-          default: false
-        forceSecureCardValidation:
-          type: boolean
-          default: false
-        allowHostedPageStorage:
-          type: boolean
-          default: false
-        allowHostedPageAutomaticStorage:
-          type: boolean
-          default: false
-        hostedPageEmailFieldSetup:
-          type: string
-          enum:
-          - HIDDEN
-          - OPTIONAL
-          - MANDATORY
-          - READONLY
-        secureCredentialsReceiptUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        allowSubscriptions:
-          type: boolean
-          default: false
-        subscriptionMaxMissedPeriods:
-          type: integer
-          format: int32
-          default: 2
-        subscriptionMaxAuthorizationAttempts:
-          type: integer
-          format: int32
-          default: 1
-        subscriptionMaxDaysWaitingForPayment:
-          type: integer
-          format: int32
-          default: 60
-        subscriptionNotificationRepeatIntervalInDays:
-          type: integer
-          format: int32
-          default: 3
-        subscriptionPaymentNotificationIntervalInDays:
-          type: integer
-          format: int32
-          default: 30
-        subscriptionMissedPeriodsThresholdForNotification:
-          type: integer
-          format: int32
-          default: 2
-        subscriptionReceiptUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        subscriptionNotificationUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        accountUpdater:
-          $ref: '#/components/schemas/AccountUpdater'
-    SentinelDefend:
-      required:
-      - apiKey
-      - organizationId
-      type: object
-      properties:
-        enable:
-          type: boolean
-          default: false
-        organizationId:
-          maxLength: 32
-          minLength: 0
-          type: string
-        apiKey:
-          maxLength: 32
-          minLength: 0
-          type: string
-        policyName:
-          maxLength: 32
-          minLength: 0
-          type: string
-        rejectOnError:
-          type: boolean
-          default: false
-        riskScoreThreshold:
-          maximum: 100
-          minimum: -100
-          type: integer
-          format: int32
-          default: 0
-    Shopify:
-      type: object
-      properties:
-        enable:
-          type: boolean
-          default: false
-        password:
-          maxLength: 1024
-          minLength: 0
-          type: string
-          readOnly: true
-    Terminal:
-      required:
-      - paymentProcessor
-      - secret
-      type: object
-      properties:
-        paymentProcessor:
-          type: string
-          description: The financial entity that will process and authorise the operations performed by the terminal.
-        terminalNumber:
-          type: string
-          description: Unique number assigned by Worldnet.
-          readOnly: true
-        deactivationDate:
-          type: string
-          description: Date when the terminal was deactivated.
-          format: date-time
-          readOnly: true
-        secret:
-          maxLength: 48
-          minLength: 8
-          type: string
-          description: The shared secret is used in digest verifications to verify the authenticity of requests.
-          writeOnly: true
-        templateName:
-          maxLength: 100
-          minLength: 0
-          type: string
-        bankSettings:
-          $ref: '#/components/schemas/TerminalBankSettings'
-        terminalLocation:
-          $ref: '#/components/schemas/TerminalLocationDetails'
-        terminalFeatures:
-          $ref: '#/components/schemas/TerminalFeatures'
-        fraudDetection:
-          $ref: '#/components/schemas/TerminalFraudDetection'
-        integrationSettings:
-          $ref: '#/components/schemas/TerminalIntegrationSettings'
-        receiptNotifications:
-          $ref: '#/components/schemas/TerminalReceiptNotifications'
-        unionPayProcessing:
-          $ref: '#/components/schemas/TerminalUnionPayProcessing'
-        volumeLimits:
-          $ref: '#/components/schemas/TerminalVolumeLimits'
-        supportedCards:
-          uniqueItems: true
-          type: array
-          description: List of card brands supported by the terminal.
-          items:
-            type: string
-            description: List of card brands supported by the terminal.
         supportedCurrencies:
           uniqueItems: true
           type: array
-          description: List of currencies supported by the terminal.
           items:
             type: string
-            description: List of currencies supported by the terminal.
             enum:
             - AED
             - AFN
@@ -8807,6 +9514,358 @@ components:
             - ZAR
             - ZMW
             - ZWL
+        allowMoto:
+          type: boolean
+          default: true
+        allowInternet:
+          type: boolean
+          default: false
+        allowRecurring:
+          type: boolean
+          default: true
+        bankMerchantId:
+          maxLength: 24
+          minLength: 1
+          type: string
+        bankMerchantPassword:
+          maxLength: 512
+          minLength: 0
+          type: string
+        defaultCardholderEmail:
+          maxLength: 1024
+          minLength: 0
+          type: string
+        enableAutomaticSettle:
+          type: boolean
+          default: true
+        batchTime:
+          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
+          type: string
+          example: 00:00
+        displayName:
+          maxLength: 14
+          minLength: 0
+          type: string
+        allowEditDisplayName:
+          type: boolean
+          default: false
+        forceUniqueOrderId:
+          type: boolean
+          default: true
+    NmiFeatures:
+      type: object
+      properties:
+        allowAcquiring:
+          type: boolean
+          default: false
+        allowDashboard:
+          type: boolean
+          default: false
+        allowBulkPayments:
+          type: boolean
+          default: false
+        allowScheduleReports:
+          type: boolean
+          default: false
+        allowVirtualTerminalAutoOrderId:
+          type: boolean
+          default: false
+        enableDecryptx:
+          type: boolean
+          default: false
+        payLink:
+          $ref: '#/components/schemas/PayLink'
+        shopify:
+          $ref: '#/components/schemas/Shopify'
+        secureCredentials:
+          $ref: '#/components/schemas/SecureCredentials'
+    NmiFraudDetection:
+      type: object
+      properties:
+        refundPercentageLimit:
+          maximum: 100.00
+          exclusiveMaximum: false
+          type: number
+          format: double
+          default: 100
+        addressVerification:
+          $ref: '#/components/schemas/AddressVerificationSystem'
+        cvvVerification:
+          $ref: '#/components/schemas/CardSecurityCodeVerification'
+        maxMind:
+          $ref: '#/components/schemas/MaxMind'
+        sentinelDefend:
+          $ref: '#/components/schemas/SentinelDefend'
+    NmiIntegrationSettings:
+      required:
+      - backgroundValidationUrl
+      type: object
+      properties:
+        useUniqueRef:
+          type: boolean
+          default: true
+        enableAutoReady:
+          type: boolean
+          default: true
+        autoReadyAmountLimit:
+          type: integer
+          format: int32
+          default: 0
+        hostedPageVersion:
+          type: string
+          enum:
+          - VERSION_1
+          - VERSION_2
+          default: VERSION_2
+        enableBackgroundValidation:
+          type: boolean
+          default: false
+        backgroundValidationUrl:
+          maxLength: 1024
+          minLength: 0
+          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
+          type: string
+        receiptPageUrl:
+          maxLength: 1024
+          minLength: 0
+          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
+          type: string
+        mpiReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
+          type: string
+        enableAdditionalFieldXmlResponseTag:
+          type: boolean
+          default: true
+        enableOriginalResponseXmlResponseTag:
+          type: boolean
+          default: false
+        enableMaskedCardXmlResponseTag:
+          type: boolean
+          default: false
+        enableSupportsApplePayXmlResponseTag:
+          type: boolean
+          default: true
+        enableSupportsGooglePayXmlResponseTag:
+          type: boolean
+          default: true
+        enableEnable3dsXmlResponseTag:
+          type: boolean
+          default: true
+        enableSupportedCardsXmlResponseTag:
+          type: boolean
+          default: true
+    NmiTerminal:
+      required:
+      - bankSettings
+      - paymentProcessor
+      - secret
+      - terminalLocation
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Terminal'
+      - type: object
+        properties:
+          bankSettings:
+            $ref: '#/components/schemas/NmiBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
+          terminalFeatures:
+            $ref: '#/components/schemas/NmiFeatures'
+          fraudDetection:
+            $ref: '#/components/schemas/NmiFraudDetection'
+          integrationSettings:
+            $ref: '#/components/schemas/NmiIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
+          achProcessing:
+            $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
+      x-discriminator-value: NMI
+    PayLink:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          default: false
+        logoUrl:
+          maxLength: 200
+          minLength: 0
+          type: string
+        footerNotes:
+          maxLength: 2000
+          minLength: 0
+          type: string
+    PaymentFacilitator:
+      required:
+      - subMerchantIdentifier
+      - subMerchantName
+      type: object
+      properties:
+        enable:
+          type: boolean
+          default: false
+        subMerchantName:
+          maxLength: 100
+          minLength: 0
+          type: string
+        subMerchantIdentifier:
+          maxLength: 15
+          minLength: 0
+          type: string
+    SecureCredentials:
+      required:
+      - hostedPageEmailFieldSetup
+      type: object
+      properties:
+        enable:
+          type: boolean
+          default: false
+        enableSecureCardValidation:
+          type: boolean
+          default: false
+        forceSecureCardValidation:
+          type: boolean
+          default: false
+        allowHostedPageStorage:
+          type: boolean
+          default: false
+        allowHostedPageAutomaticStorage:
+          type: boolean
+          default: false
+        hostedPageEmailFieldSetup:
+          type: string
+          enum:
+          - HIDDEN
+          - OPTIONAL
+          - MANDATORY
+          - READONLY
+        secureCredentialsReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
+          type: string
+        allowSubscriptions:
+          type: boolean
+          default: false
+        subscriptionMaxMissedPeriods:
+          type: integer
+          format: int32
+          default: 2
+        subscriptionMaxAuthorizationAttempts:
+          type: integer
+          format: int32
+          default: 1
+        subscriptionMaxDaysWaitingForPayment:
+          type: integer
+          format: int32
+          default: 60
+        subscriptionNotificationRepeatIntervalInDays:
+          type: integer
+          format: int32
+          default: 3
+        subscriptionPaymentNotificationIntervalInDays:
+          type: integer
+          format: int32
+          default: 30
+        subscriptionMissedPeriodsThresholdForNotification:
+          type: integer
+          format: int32
+          default: 2
+        subscriptionReceiptUrl:
+          maxLength: 1024
+          minLength: 0
+          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
+          type: string
+        subscriptionNotificationUrl:
+          maxLength: 1024
+          minLength: 0
+          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
+          type: string
+        accountUpdater:
+          $ref: '#/components/schemas/AccountUpdater'
+    SentinelDefend:
+      required:
+      - apiKey
+      - organizationId
+      type: object
+      properties:
+        enable:
+          type: boolean
+          default: false
+        organizationId:
+          maxLength: 32
+          minLength: 0
+          type: string
+        apiKey:
+          maxLength: 32
+          minLength: 0
+          type: string
+        policyName:
+          maxLength: 32
+          minLength: 0
+          type: string
+        rejectOnError:
+          type: boolean
+          default: false
+        riskScoreThreshold:
+          maximum: 100
+          minimum: -100
+          type: integer
+          format: int32
+          default: 0
+    Shopify:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          default: false
+        password:
+          maxLength: 1024
+          minLength: 0
+          type: string
+          readOnly: true
+    Terminal:
+      required:
+      - paymentProcessor
+      - secret
+      type: object
+      properties:
+        paymentProcessor:
+          type: string
+          description: The financial entity that will process and authorise the operations
+            performed by the terminal.
+        terminalNumber:
+          type: string
+          description: Unique number assigned by Worldnet.
+          readOnly: true
+        deactivationDate:
+          type: string
+          description: Date when the terminal was deactivated.
+          format: date-time
+          readOnly: true
+        secret:
+          maxLength: 48
+          minLength: 8
+          type: string
+          description: The shared secret is used in digest verifications to verify
+            the authenticity of requests.
+          writeOnly: true
+        templateName:
+          maxLength: 100
+          minLength: 0
+          type: string
+        unionPayProcessing:
+          $ref: '#/components/schemas/TerminalUnionPayProcessing'
+        volumeLimits:
+          $ref: '#/components/schemas/TerminalVolumeLimits'
+        supportedCards:
+          uniqueItems: true
+          type: array
+          description: List of card brands supported by the terminal.
+          items:
+            type: string
+            description: List of card brands supported by the terminal.
       discriminator:
         propertyName: paymentProcessor
         mapping:
@@ -8850,200 +9909,6 @@ components:
         enable:
           type: boolean
           default: false
-    TerminalBankSettings:
-      type: object
-      properties:
-        enableAutomaticSettle:
-          type: boolean
-          default: true
-        displayName:
-          maxLength: 14
-          minLength: 0
-          type: string
-        allowEditDisplayName:
-          type: boolean
-          default: false
-        forceUniqueOrderId:
-          type: boolean
-          default: true
-        baseCurrency:
-          type: string
-          enum:
-          - AED
-          - AFN
-          - ALL
-          - AMD
-          - ANG
-          - AOA
-          - ARS
-          - AUD
-          - AWG
-          - AZN
-          - BAM
-          - BBD
-          - BDT
-          - BGN
-          - BHD
-          - BIF
-          - BMD
-          - BND
-          - BOB
-          - BOV
-          - BRL
-          - BSD
-          - BTN
-          - BWP
-          - BYR
-          - BZD
-          - CAD
-          - CDF
-          - CHE
-          - CHF
-          - CHW
-          - CLF
-          - CLP
-          - CNY
-          - COP
-          - COU
-          - CRC
-          - CUC
-          - CUP
-          - CVE
-          - CZK
-          - DJF
-          - DKK
-          - DOP
-          - DZD
-          - EGP
-          - ERN
-          - ETB
-          - EUR
-          - FJD
-          - FKP
-          - GBP
-          - GEL
-          - GHS
-          - GIP
-          - GMD
-          - GNF
-          - GTQ
-          - GYD
-          - HKD
-          - HNL
-          - HRK
-          - HTG
-          - HUF
-          - IDR
-          - ILS
-          - INR
-          - IQD
-          - IRR
-          - ISK
-          - JMD
-          - JOD
-          - JPY
-          - KES
-          - KGS
-          - KHR
-          - KMF
-          - KPW
-          - KRW
-          - KWD
-          - KYD
-          - KZT
-          - LAK
-          - LBP
-          - LKR
-          - LRD
-          - LSL
-          - LTL
-          - LVL
-          - LYD
-          - MAD
-          - MDL
-          - MGA
-          - MKD
-          - MMK
-          - MNT
-          - MOP
-          - MRO
-          - MRU
-          - MUR
-          - MVR
-          - MWK
-          - MXN
-          - MXV
-          - MYR
-          - MZN
-          - NAD
-          - NGN
-          - NIO
-          - NOK
-          - NPR
-          - NZD
-          - OMR
-          - PAB
-          - PEN
-          - PGK
-          - PHP
-          - PKR
-          - PLN
-          - PYG
-          - QAR
-          - RON
-          - RSD
-          - RUB
-          - RWF
-          - SAR
-          - SBD
-          - SCR
-          - SDG
-          - SEK
-          - SGD
-          - SHP
-          - SLL
-          - SOS
-          - SRD
-          - SSP
-          - STD
-          - STN
-          - SVC
-          - SYP
-          - SZL
-          - THB
-          - TJS
-          - TMT
-          - TND
-          - TOP
-          - TRY
-          - TTD
-          - TWD
-          - TZS
-          - UAH
-          - UGX
-          - USD
-          - USN
-          - USS
-          - UYI
-          - UYU
-          - UZS
-          - VEF
-          - VES
-          - VND
-          - VUV
-          - WST
-          - XAF
-          - XCD
-          - XOF
-          - XPF
-          - YER
-          - ZAR
-          - ZMW
-          - ZWL
-        batchTime:
-          pattern: ^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$
-          type: string
-          example: 00:00
     TerminalFeatures:
       type: object
       properties:
@@ -9059,94 +9924,31 @@ components:
         enableDecryptx:
           type: boolean
           default: false
-    TerminalFraudDetection:
-      type: object
-      properties:
-        refundPercentageLimit:
-          maximum: 100.00
-          exclusiveMaximum: false
-          type: number
-          format: double
-          default: 100
-        cvvVerification:
-          $ref: '#/components/schemas/CardSecurityCodeVerification'
-        maxMind:
-          $ref: '#/components/schemas/MaxMind'
-        addressVerification:
-          $ref: '#/components/schemas/AddressVerificationSystem'
-    TerminalIntegrationSettings:
-      required:
-      - backgroundValidationUrl
-      type: object
-      properties:
-        useUniqueRef:
-          type: boolean
-          default: true
-        enableAutoReady:
-          type: boolean
-          default: true
-        autoReadyAmountLimit:
-          type: integer
-          format: int32
-          default: 0
-        hostedPageVersion:
-          type: string
-          enum:
-          - VERSION_1
-          - VERSION_2
-          default: VERSION_2
-        enableBackgroundValidation:
-          type: boolean
-          default: false
-        receiptPageUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
-        enableAdditionalFieldXmlResponseTag:
-          type: boolean
-          default: true
-        enableMaskedCardXmlResponseTag:
-          type: boolean
-          default: false
-        enableSupportsApplePayXmlResponseTag:
-          type: boolean
-          default: true
-        enableSupportsGooglePayXmlResponseTag:
-          type: boolean
-          default: true
-        enableEnable3dsXmlResponseTag:
-          type: boolean
-          default: true
-        enableSupportedCardsXmlResponseTag:
-          type: boolean
-          default: true
-        backgroundValidationUrl:
-          maxLength: 1024
-          minLength: 0
-          pattern: ^(?:(?:https?|ftps?)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$
-          type: string
     TerminalLevelLimit:
       required:
-      - limitScope
+      - currentValue
+      - limitThreshold
       type: object
       properties:
         limitThreshold:
+          minimum: 1
           type: integer
           format: int32
-        withoutCvvOnly:
-          type: boolean
-        withoutAvsOnly:
-          type: boolean
-        currentValue:
-          type: number
-          format: double
         limitScope:
           type: string
           enum:
           - DAILY
           - MONTHLY
           - SINGLE_TRANSACTION
+        currentValue:
+          maximum: 9999999999
+          exclusiveMaximum: false
+          type: number
+          format: double
+        withoutCvvOnly:
+          type: boolean
+        withoutAvsOnly:
+          type: boolean
     TerminalLocationDetails:
       required:
       - country
@@ -9256,9 +10058,6 @@ components:
         draft256Billing:
           $ref: '#/components/schemas/Draft256Billing'
     TerminalVolumeLimits:
-      required:
-      - cardLevelLimits
-      - terminalLevelLimits
       type: object
       properties:
         enableTerminalLevelLimits:
@@ -9301,7 +10100,6 @@ components:
       - agentChainNumber
       - bankMerchantId
       - bankTerminalId
-      - baseCurrency
       - groupBankName
       - storeNumber
       - terminalIdNumber
@@ -9314,8 +10112,18 @@ components:
         allowMulticurrency:
           type: boolean
           default: false
+        allowEmcp:
+          type: boolean
+          default: false
+        allowEdcc:
+          type: boolean
+          default: false
+        edccProvider:
+          type: string
+          readOnly: true
         baseCurrency:
           type: string
+          readOnly: true
           enum:
           - AED
           - AFN
@@ -9488,15 +10296,183 @@ components:
           - ZAR
           - ZMW
           - ZWL
-        allowEmcp:
-          type: boolean
-          default: false
-        allowEdcc:
-          type: boolean
-          default: false
-        edccProvider:
-          type: string
-          readOnly: true
+        supportedCurrencies:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            enum:
+            - AED
+            - AFN
+            - ALL
+            - AMD
+            - ANG
+            - AOA
+            - ARS
+            - AUD
+            - AWG
+            - AZN
+            - BAM
+            - BBD
+            - BDT
+            - BGN
+            - BHD
+            - BIF
+            - BMD
+            - BND
+            - BOB
+            - BOV
+            - BRL
+            - BSD
+            - BTN
+            - BWP
+            - BYR
+            - BZD
+            - CAD
+            - CDF
+            - CHE
+            - CHF
+            - CHW
+            - CLF
+            - CLP
+            - CNY
+            - COP
+            - COU
+            - CRC
+            - CUC
+            - CUP
+            - CVE
+            - CZK
+            - DJF
+            - DKK
+            - DOP
+            - DZD
+            - EGP
+            - ERN
+            - ETB
+            - EUR
+            - FJD
+            - FKP
+            - GBP
+            - GEL
+            - GHS
+            - GIP
+            - GMD
+            - GNF
+            - GTQ
+            - GYD
+            - HKD
+            - HNL
+            - HRK
+            - HTG
+            - HUF
+            - IDR
+            - ILS
+            - INR
+            - IQD
+            - IRR
+            - ISK
+            - JMD
+            - JOD
+            - JPY
+            - KES
+            - KGS
+            - KHR
+            - KMF
+            - KPW
+            - KRW
+            - KWD
+            - KYD
+            - KZT
+            - LAK
+            - LBP
+            - LKR
+            - LRD
+            - LSL
+            - LTL
+            - LVL
+            - LYD
+            - MAD
+            - MDL
+            - MGA
+            - MKD
+            - MMK
+            - MNT
+            - MOP
+            - MRO
+            - MRU
+            - MUR
+            - MVR
+            - MWK
+            - MXN
+            - MXV
+            - MYR
+            - MZN
+            - NAD
+            - NGN
+            - NIO
+            - NOK
+            - NPR
+            - NZD
+            - OMR
+            - PAB
+            - PEN
+            - PGK
+            - PHP
+            - PKR
+            - PLN
+            - PYG
+            - QAR
+            - RON
+            - RSD
+            - RUB
+            - RWF
+            - SAR
+            - SBD
+            - SCR
+            - SDG
+            - SEK
+            - SGD
+            - SHP
+            - SLL
+            - SOS
+            - SRD
+            - SSP
+            - STD
+            - STN
+            - SVC
+            - SYP
+            - SZL
+            - THB
+            - TJS
+            - TMT
+            - TND
+            - TOP
+            - TRY
+            - TTD
+            - TWD
+            - TZS
+            - UAH
+            - UGX
+            - USD
+            - USN
+            - USS
+            - UYI
+            - UYU
+            - UZS
+            - VEF
+            - VES
+            - VND
+            - VUV
+            - WST
+            - XAF
+            - XCD
+            - XOF
+            - XPF
+            - YER
+            - ZAR
+            - ZMW
+            - ZWL
         allowMoto:
           type: boolean
           default: true
@@ -9600,7 +10576,7 @@ components:
           type: string
     TsysSaratogaEnhancedData:
       required:
-      - apiShippingAddressMode
+      - preferredShippingAddressMode
       - txnDataLevel
       type: object
       properties:
@@ -9616,11 +10592,6 @@ components:
           - STANDARD
           - LEVEL_II
           - LEVEL_III
-        apiShippingAddressMode:
-          type: string
-          enum:
-          - EXACT
-          - POSTAL
         merchantTaxId:
           maxLength: 10
           minLength: 0
@@ -9629,6 +10600,11 @@ components:
           maxLength: 4
           minLength: 0
           type: string
+        preferredShippingAddressMode:
+          type: string
+          enum:
+          - EXACT
+          - POSTAL
     TsysSaratogaFeatures:
       type: object
       properties:
@@ -9833,6 +10809,8 @@ components:
             $ref: '#/components/schemas/TsysSaratogaFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/TsysSaratogaIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: TSYS Saratoga
@@ -10331,6 +11309,8 @@ components:
             $ref: '#/components/schemas/TsysSierraFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/TsysSierraIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: TSYS
@@ -10540,6 +11520,8 @@ components:
         secureCredentials:
           $ref: '#/components/schemas/SecureCredentials'
     UnassignedIntegrationSettings:
+      required:
+      - backgroundValidationUrl
       type: object
       properties:
         enableBackgroundValidation:
@@ -10583,6 +11565,8 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/UnassignedBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/UnassignedFeatures'
           integrationSettings:
@@ -10959,12 +11943,16 @@ components:
         properties:
           bankSettings:
             $ref: '#/components/schemas/VacpG2GBankSettings'
+          terminalLocation:
+            $ref: '#/components/schemas/TerminalLocationDetails'
           terminalFeatures:
             $ref: '#/components/schemas/VacpG2GFeatures'
           fraudDetection:
             $ref: '#/components/schemas/VacpG2GFraudDetection'
           integrationSettings:
             $ref: '#/components/schemas/VacpG2GIntegrationSettings'
+          receiptNotifications:
+            $ref: '#/components/schemas/TerminalReceiptNotifications'
           achProcessing:
             $ref: '#/components/schemas/TerminalAchJackHenryProcessing'
       x-discriminator-value: VACP G2G
@@ -10996,44 +11984,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TerminalCompact'
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-        totalCount:
-          type: integer
-          format: int64
-    MerchantCompact:
-      type: object
-      properties:
-        merchantId:
-          type: string
-        dbaName:
-          type: string
-        gatewayHost:
-          type: string
-        contactName:
-          type: string
-        contactPhone:
-          type: string
-        contactEmail:
-          type: string
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-    MerchantPaginatedResult:
-      required:
-      - data
-      - totalCount
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/MerchantCompact'
         links:
           uniqueItems: true
           type: array
@@ -11109,6 +12059,44 @@ components:
         totalCount:
           type: integer
           format: int64
+    PartnerCompact:
+      type: object
+      properties:
+        partnerPortfolioId:
+          type: string
+        name:
+          type: string
+        gateway:
+          type: string
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+        contactEmail:
+          type: string
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+    PartnerPaginatedResult:
+      required:
+      - data
+      - totalCount
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnerCompact'
+        links:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/HypermediaLink'
+        totalCount:
+          type: integer
+          format: int64
     PartnerPortfolio:
       required:
       - contactEmail
@@ -11157,44 +12145,6 @@ components:
           type: string
         partnerPortfolioId:
           type: string
-    PartnerCompact:
-      type: object
-      properties:
-        partnerPortfolioId:
-          type: string
-        name:
-          type: string
-        gateway:
-          type: string
-        contactName:
-          type: string
-        contactPhone:
-          type: string
-        contactEmail:
-          type: string
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-    PartnerPaginatedResult:
-      required:
-      - data
-      - totalCount
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PartnerCompact'
-        links:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/HypermediaLink'
-        totalCount:
-          type: integer
-          format: int64
   securitySchemes:
     Basic:
       type: http
